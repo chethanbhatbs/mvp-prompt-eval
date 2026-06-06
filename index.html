@@ -2,73 +2,83 @@
 <title>MVP-Phasing Prompt Eval — Decision Report</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root{--bg:#0e1116;--card:#171c24;--tx:#eef2f7;--mut:#9aa6b2;--bd:#262d38;--norm:#b07cff;--v2:#43c59e;--e3:#4da3ff;--good:#43c59e;--bad:#ff6b6b;--warn:#f0a830}
-body.light{--bg:#f6f8fb;--card:#fff;--tx:#161b22;--mut:#5a6573;--bd:#e2e8f0}
-*{box-sizing:border-box}body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx)}
-.wrap{max-width:1080px;margin:0 auto;padding:26px 30px 50px}
-h1{font-size:22px;margin:0 0 2px}.sub{color:var(--mut);font-size:13px;margin-bottom:16px}
-.toggle{position:fixed;top:12px;right:12px;background:var(--card);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:5px 11px;cursor:pointer;font-size:12px}
-.verdict{background:linear-gradient(95deg,rgba(77,163,255,.16),rgba(67,197,158,.12));border:1px solid var(--bd);border-left:4px solid var(--e3);border-radius:12px;padding:16px 20px;margin-bottom:18px}
-.verdict .big{font-size:18px;font-weight:800}.verdict .big b{color:var(--e3)}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
-.kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px}
-.kpi .n{font-size:26px;font-weight:800}.kpi .l{color:var(--mut);font-size:11.5px;margin-top:2px}
-.legend{font-size:12px;color:var(--mut);margin:4px 0 14px}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 4px 0 12px;vertical-align:middle}
-.row{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:16px}
-.card h3{margin:0 0 10px;font-size:14px}
-ul{margin:6px 0;padding-left:18px}li{margin:6px 0}
-.tag{font-weight:700}.gt{color:var(--good)}.bt{color:var(--bad)}.wt{color:var(--warn)}
-.win{background:rgba(67,197,158,.14);border:1px solid rgba(67,197,158,.4);border-radius:10px;padding:12px 16px;margin-top:6px}
-.foot{color:var(--mut);font-size:11px;margin-top:16px}
-@media(max-width:780px){.kpis{grid-template-columns:repeat(2,1fr)}.row{grid-template-columns:1fr}}
-</style></head><body>
-<button class=toggle onclick="document.body.classList.toggle('light')">◐ theme</button>
-<div class=wrap>
+:root{--bg:#ffffff;--ink:#1a1f29;--mut:#646e7b;--line:#e4e8ee;--accent:#1f5fae;--g:#1a7f55;--gb:#e3f3ec;--a:#9a6b00;--ab:#fbf1da;--r:#b23b3b;--rb:#f8e6e6;--soft:#f7f9fc}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--soft)}
+.page{max-width:1000px;margin:24px auto;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:34px 40px 40px}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);font-weight:600}
+h1{font-size:23px;margin:3px 0 2px;letter-spacing:-.01em}
+.meta{color:var(--mut);font-size:12.5px;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px}
+.callout{border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--soft);padding:13px 16px;border-radius:4px;margin-bottom:22px;font-size:15px}
+.callout b{color:var(--accent)}
+h2{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:26px 0 10px;font-weight:700}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:center}
+th{background:var(--soft);font-weight:600;color:var(--mut)}
+td.lab,th.lab{text-align:left;font-weight:600;color:var(--ink)}
+.cell-g{background:var(--gb);color:var(--g);font-weight:700}.cell-a{background:var(--ab);color:var(--a);font-weight:700}.cell-r{background:var(--rb);color:var(--r);font-weight:700}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:26px;align-items:start}
+.armrow{display:flex;gap:10px;margin:8px 0 0}
+.armc{flex:1;border:1px solid var(--line);border-radius:5px;padding:11px 13px}
+.armc .nm{font-size:12px;color:var(--mut);font-weight:600}.armc .v{font-size:19px;font-weight:800;margin-top:3px}
+ul{margin:8px 0;padding-left:17px}li{margin:7px 0;font-size:13.5px}
+.k{font-weight:700}.kg{color:var(--g)}.kr{color:var(--r)}.ka{color:var(--a)}
+.decision{border:1px solid #cfe6db;background:var(--gb);border-radius:5px;padding:13px 16px;margin-top:14px;font-size:13.5px}
+.foot{color:var(--mut);font-size:11px;margin-top:22px;border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.armrow{flex-wrap:wrap}.page{padding:22px}}
+</style></head><body><div class=page>
+<div class=eyebrow>emergent.sh · free-tier conversion experiment</div>
 <h1>MVP-Phasing Prompt Eval — Decision Report</h1>
-<div class=sub>3 arms · 46 builds · prompts P1–P5 · cost + quality + free-tier conversion · 2026-06-06</div>
+<div class=meta>3 prompt variants (Normal · v2_credit_cap · eph3/long-prompt-1) · 46 builds · prompts P1–P5 · 6 Jun 2026</div>
 
-<div class=verdict><div class=big>Recommend <b>eph3 (long-prompt-1)</b> — MVP-split wins on conversion, and eph3 captures it <b>without the quality drop</b> that v2 has.</div></div>
+<div class=callout>Recommendation: ship the <b>MVP-split</b> prompt and adopt the <b>eph3 (long-prompt-1)</b> variant — it delivers the free-tier conversion gain <b>without the quality loss</b> seen in v2_credit_cap.</div>
 
-<div class=kpis>
-<div class=kpi><div class=n style="color:var(--good)">+24pts</div><div class=l>free-tier preview rate vs Normal (53%→77% v2 / 70% eph3)</div></div>
-<div class=kpi><div class=n style="color:var(--e3)">7.7</div><div class=l>eph3 avg code quality (highest) · v2 6.6 · Normal 7.2</div></div>
-<div class=kpi><div class=n style="color:var(--v2)">−30%</div><div class=l>ECU vs Normal — both split arms are cheaper</div></div>
-<div class=kpi><div class=n style="color:var(--warn)">0.3%</div><div class=l>LLM-call error rate · 0 context-compaction (reliable)</div></div>
+<h2>Headline metrics</h2>
+<div class=armrow>
+<div class=armc><div class=nm>Normal (baseline)</div><div class=v>53%</div><div class=nm>preview ≤10cr · Q 7.2 · 23.9 ECU</div></div>
+<div class=armc><div class=nm>v2_credit_cap</div><div class=v>77%</div><div class=nm>preview ≤10cr · Q 6.6 · 16.7 ECU</div></div>
+<div class=armc><div class=nm>eph3 (long-prompt-1)</div><div class=v>70%</div><div class=nm>preview ≤10cr · Q 7.7 · 22.4 ECU</div></div>
 </div>
 
-<div class=legend>Arms:<span class=dot style="background:var(--norm)"></span>Normal (baseline)<span class=dot style="background:var(--v2)"></span>v2_credit_cap<span class=dot style="background:var(--e3)"></span>eph3</div>
-
-<div class=row>
-<div class=card><h3>Preview opens within the 10-credit free cap — by prompt</h3><canvas id=c1 height=150></canvas>
-<div style="color:var(--mut);font-size:11px;margin-top:6px">% of runs that rendered a preview at ≤10 ECU (the moment a free user sees value).</div></div>
-<div class=card><h3>Quality vs Cost per arm</h3><canvas id=c2 height=150></canvas>
-<div style="color:var(--mut);font-size:11px;margin-top:6px">Code quality /10 (bars) vs avg ECU/job (line). Best = high bar, low line.</div></div>
+<div class=grid>
+<div>
+<h2>Does a preview open within the 10-credit free cap?</h2>
+<table>
+<tr><th class=lab>Prompt</th><th>Normal</th><th>v2_credit_cap</th><th>eph3</th></tr>
+<tr><td class=lab>P1 · Task Mgmt</td><td class=cell-r>0%</td><td class=cell-g>100%</td><td class=cell-g>100%</td></tr>
+<tr><td class=lab>P2 · PopUp Profit</td><td class=cell-g>100%</td><td class=cell-g>100%</td><td class=cell-g>100%</td></tr>
+<tr><td class=lab>P3 · Micro-Loans</td><td class=cell-r>0%</td><td class=cell-r>0%</td><td class=cell-r>0%</td></tr>
+<tr><td class=lab>P4 · Laser</td><td class=cell-a>67%</td><td class=cell-g>83%</td><td class=cell-a>50%</td></tr>
+<tr><td class=lab>P5 · Game</td><td class=cell-g>100%</td><td class=cell-g>100%</td><td class=cell-g>100%</td></tr>
+</table>
+<div style="font-size:11px;color:var(--mut);margin-top:6px">Green ≥80% · amber 50–79% · red &lt;50%. "Preview" = first app render (first screenshot) at ≤10 ECU.</div>
+</div>
+<div>
+<h2>Quality vs cost per arm</h2>
+<canvas id=c2 height=200></canvas>
+<div style="font-size:11px;color:var(--mut);margin-top:6px">Bars = code quality /10 · line = avg ECU/job. Best = tall bar, low line.</div>
+</div>
 </div>
 
-<div class=card><h3>What this means — the 6 points</h3>
+<h2>What it means</h2>
 <ul>
-<li><span class="tag gt">The fix works.</span> MVP-split gets free users to a preview within 10 credits far more often: Normal <b>53%</b> → v2 <b>77%</b> / eph3 <b>70%</b>.</li>
-<li><span class="tag gt">Biggest win is exactly where it hurt — long prompts.</span> P1: Normal previews at 10–11 ECU (<b>misses</b> the cap on all 3 runs); v2 & eph3 land at ~6 ECU (<b>3/3 within cap</b>).</li>
-<li><span class="tag">eph3 is the best variant.</span> Highest quality (<b>7.7</b>, wins 3/5 prompts) and previews within cap 70% — the cost win <b>without</b> under-building.</li>
-<li><span class="tag bt">v2 is cheapest but risky.</span> Lowest cost, but on the complex Task app its best build scored only <b>4/10</b> (thin) — it under-builds to hit the cap.</li>
-<li><span class="tag wt">P3 (heavy dashboards) is unsolved.</span> Every arm previews only at 12–22 ECU — <b>over the cap regardless</b>. Needs a separate lever (higher free cap / harder slicing).</li>
-<li><span class="tag">Reliable & fair.</span> 2,637 LLM calls, 0.3% errors (all timeout-retries, recovered), 0 compaction, spread evenly across arms.</li>
+<li><span class="k kg">The split works.</span> Free users reach a preview within 10 credits far more often — Normal 53% → v2 77% / eph3 70%.</li>
+<li><span class="k kg">Win is on long prompts.</span> P1: Normal never previews in budget (10–11 ECU); both split arms hit it at ~6 ECU (100%).</li>
+<li><span class="k">eph3 is the pick.</span> Highest quality (7.7) and strong conversion — captures the cost win without under-building.</li>
+<li><span class="k kr">v2 is cheapest but thin.</span> On the complex Task app its best build scored 4/10 — it cuts scope to hit the cap.</li>
+<li><span class="k ka">P3 is unsolved.</span> Every arm previews only at 12–22 ECU — over the cap regardless; needs a separate fix.</li>
+<li><span class="k">Reliable & fair.</span> 2,637 LLM calls · 0.3% errors (all timeout-retries) · 0 compaction · spread evenly across arms.</li>
 </ul>
-<div class=win><b>Decision:</b> ship the <b>MVP-split</b> prompt; adopt the <b>eph3 (long-prompt-1)</b> variant. Add a separate plan for P3-class heavy prompts. Re-run live functional E2E once preview pods are healthy (6/6 passed where live).</div>
-</div>
+<div class=decision><b>Decision:</b> ship MVP-split → adopt <b>eph3</b>. Separate workstream for P3-class heavy prompts. Live functional E2E re-run pending preview-pod revival (6/6 passed where live).</div>
 
-<div class=foot>Sources: credit_ledger (ECU), trajectories (preview = ECU at first screenshot), 46 static code reviews (quality), llm_logs_partitioned (reliability). Fair method: rates weighted equally per prompt (raw vs balanced differ &lt;2pts). Full data + per-job detail + deviation notes in MVP-Eval-3arm.xlsx.</div>
+<div class=foot>Sources: credit_ledger (ECU) · trajectories (preview = ECU at first screenshot) · 46 static code reviews (quality) · llm_logs_partitioned (reliability). Rates weighted equally per prompt. Full per-job data, deviation notes & methodology in MVP-Eval-3arm.xlsx.</div>
 </div>
 <script>
-const PR=['P1 Task','P2 PopUp','P3 Loans','P4 Laser','P5 Game'];
-new Chart(c1,{type:'bar',data:{labels:PR,datasets:[
-{label:'Normal',data:[0,100,0,67,100],backgroundColor:'#b07cff'},
-{label:'v2_credit_cap',data:[100,100,0,83,100],backgroundColor:'#43c59e'},
-{label:'eph3',data:[100,100,0,50,100],backgroundColor:'#4da3ff'}]},
-options:{plugins:{legend:{labels:{color:'#9aa6b2',boxWidth:12,font:{size:11}}}},scales:{y:{max:100,ticks:{color:'#9aa6b2',callback:v=>v+'%'},title:{display:true,text:'preview ≤10 ECU',color:'#9aa6b2'}},x:{ticks:{color:'#9aa6b2'}}}}});
 new Chart(c2,{data:{labels:['Normal','v2_credit_cap','eph3'],datasets:[
-{type:'bar',label:'Quality /10',data:[7.23,6.55,7.71],backgroundColor:['#b07cff','#43c59e','#4da3ff'],yAxisID:'y'},
-{type:'line',label:'Avg ECU',data:[23.9,16.7,22.4],borderColor:'#f0a830',backgroundColor:'#f0a830',yAxisID:'y2',tension:.3}]},
-options:{plugins:{legend:{labels:{color:'#9aa6b2',boxWidth:12,font:{size:11}}}},scales:{y:{position:'left',max:10,ticks:{color:'#9aa6b2'},title:{display:true,text:'Quality',color:'#9aa6b2'}},y2:{position:'right',ticks:{color:'#9aa6b2'},title:{display:true,text:'ECU',color:'#9aa6b2'},grid:{drawOnChartArea:false}},x:{ticks:{color:'#9aa6b2'}}}}});
+{type:'bar',label:'Code quality /10',data:[7.2,6.6,7.7],backgroundColor:'#1f5fae',borderRadius:3,yAxisID:'y',datalabels:true},
+{type:'line',label:'Avg ECU/job',data:[23.9,16.7,22.4],borderColor:'#9a6b00',backgroundColor:'#9a6b00',yAxisID:'y2',tension:.25,pointRadius:4}]},
+options:{plugins:{legend:{labels:{color:'#646e7b',boxWidth:12,font:{size:11}}}},scales:{
+y:{position:'left',max:10,ticks:{color:'#646e7b'},grid:{color:'#eef1f6'}},
+y2:{position:'right',ticks:{color:'#646e7b'},grid:{drawOnChartArea:false}},
+x:{ticks:{color:'#1a1f29',font:{size:11}},grid:{display:false}}}}});
 </script></body></html>
