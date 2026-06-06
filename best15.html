@@ -1,0 +1,145 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>MVP-Phasing Eval — Best 15 (winner per arm/prompt)</title><style>
+:root{--bg:#fff;--ink:#1a1f29;--mut:#646e7b;--line:#e4e8ee;--accent:#1f5fae;--g:#1a7f55;--a:#9a6b00;--r:#b23b3b;--soft:#f7f9fc}
+*{box-sizing:border-box}body{margin:0;font:13px ui-sans-serif,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--soft)}
+.page{max-width:1080px;margin:22px auto;background:#fff;border:1px solid var(--line);border-radius:6px;padding:28px 32px 40px}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);font-weight:600}
+h1{font-size:21px;margin:3px 0 2px}.meta{color:var(--mut);font-size:12.5px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:8px}
+h2{font-size:14px;margin:24px 0 10px;letter-spacing:.02em}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.jcard{border:1px solid var(--line);border-radius:7px;padding:13px 14px;background:#fff}
+.jh{display:flex;justify-content:space-between;align-items:center;font-size:12px}.arm{font-weight:700}.cq{color:var(--mut)}
+.slug{font-weight:700;font-size:14px;margin-top:6px}.jid{font-family:ui-monospace,monospace;font-size:10px;color:var(--mut);margin-bottom:8px;word-break:break-all}
+table.m{width:100%;border-collapse:collapse;margin:4px 0 8px;font-size:11.5px}table.m td{padding:3px 4px;border-bottom:1px solid #f0f3f7}table.m td:nth-child(odd){color:var(--mut)}table.m td:nth-child(even){text-align:right;font-weight:600}
+a{color:var(--accent);text-decoration:none;font-size:12px}
+.verdict{font-size:11.5px;margin-top:8px;line-height:1.45}.iss{font-size:11px;color:var(--mut);margin-top:5px;line-height:1.4}
+.g{color:var(--g);font-weight:700}.a{color:var(--a);font-weight:700}.r{color:var(--r);font-weight:700}
+.foot{color:var(--mut);font-size:11px;margin-top:20px;border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:780px){.grid3{grid-template-columns:1fr}}
+</style></head><body><div class=page>
+<div class=eyebrow>emergent.sh · best build per arm per prompt</div>
+<h1>MVP-Phasing Eval — Best 15</h1>
+<div class=meta>The single best build per arm per prompt (by code quality → spec coverage → build size). 15 builds = 3 arms × 5 prompts. The set to functionally test.</div>
+<h2>P1 — Task Management</h2><div class=grid3><div class=jcard style="border-top:3px solid #b07cff">
+<div class=jh><span class=arm style="color:#b07cff">Normal</span><span class=cq><span class=g>7/10</span> Acceptable</span></div>
+<div class=slug>kanban-sync</div><div class=jid>98e5fd48-b954-47b2-8a64-706094b79e4e</div>
+<table class=m>
+<tr><td>ECU</td><td><b>23.16</b></td><td>Latency</td><td>47.4 min</td></tr>
+<tr><td>Steps</td><td>58</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='r'>11.39 ✗</span></td><td>LLM calls</td><td>67</td></tr>
+</table>
+<a href="https://kanban-sync.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=iss style='color:#9aa6b2'>Detailed verdict not captured for this build (score + tier shown).</div></div><div class=jcard style="border-top:3px solid #43c59e">
+<div class=jh><span class=arm style="color:#43c59e">v2_credit_cap</span><span class=cq><span class=r>4/10</span> Weak</span></div>
+<div class=slug>teamtask-1</div><div class=jid>75c54a5b-5bea-4208-bd55-be080c7f4ba1</div>
+<table class=m>
+<tr><td>ECU</td><td><b>16.88</b></td><td>Latency</td><td>35.4 min</td></tr>
+<tr><td>Steps</td><td>49</td><td>Phases</td><td>4</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>6.78 ✓</span></td><td>LLM calls</td><td>60</td></tr>
+</table>
+<a href="https://teamtask-1.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=iss style='color:#9aa6b2'>Detailed verdict not captured for this build (score + tier shown).</div></div><div class=jcard style="border-top:3px solid #4da3ff">
+<div class=jh><span class=arm style="color:#4da3ff">eph3</span><span class=cq><span class=g>7/10</span> Acceptable</span></div>
+<div class=slug>workflow-pro-6</div><div class=jid>801fb8bb-f01b-40f6-8376-2f19200abe79</div>
+<table class=m>
+<tr><td>ECU</td><td><b>11.74</b></td><td>Latency</td><td>29.4 min</td></tr>
+<tr><td>Steps</td><td>25</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>6.65 ✓</span></td><td>LLM calls</td><td>37</td></tr>
+</table>
+<a href="https://workflow-pro-6.internal.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=verdict>A clean, well-architected core (auth, task CRUD with properties, owner-scoped queries, polished dnd-kit kanban, dashboard, real backend tests) that omits roughly half the spec's distinctive features—subtasks, comments, calendar, notifications, dark-mode toggle.</div><div class=iss><b>Issues:</b> CORS allow_origins='*' with allow_credentials=True (browsers reject; insecure). No login rate limiting. update_task (server.py:316-322) has duplicated/confusing merge logic. due_date stored as string, compared lexicographically.</div></div></div><h2>P2 — PopUp Profit</h2><div class=grid3><div class=jcard style="border-top:3px solid #b07cff">
+<div class=jh><span class=arm style="color:#b07cff">Normal</span><span class=cq><span class=g>8/10</span> Strong</span></div>
+<div class=slug>booth-planner-1</div><div class=jid>4cab5e8a-39c6-47d5-805b-6756f86090dc</div>
+<table class=m>
+<tr><td>ECU</td><td><b>11.18</b></td><td>Latency</td><td>35.4 min</td></tr>
+<tr><td>Steps</td><td>28</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>4.81 ✓</span></td><td>LLM calls</td><td>36</td></tr>
+</table>
+<a href="https://booth-planner-1.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=iss style='color:#9aa6b2'>Detailed verdict not captured for this build (score + tier shown).</div></div><div class=jcard style="border-top:3px solid #43c59e">
+<div class=jh><span class=arm style="color:#43c59e">v2_credit_cap</span><span class=cq><span class=g>8/10</span> Strong</span></div>
+<div class=slug>profit-prep</div><div class=jid>7ab9ef6a-3586-4df7-bf9d-b3be3670426a</div>
+<table class=m>
+<tr><td>ECU</td><td><b>8.3</b></td><td>Latency</td><td>19.4 min</td></tr>
+<tr><td>Steps</td><td>29</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>5.04 ✓</span></td><td>LLM calls</td><td>38</td></tr>
+</table>
+<a href="https://profit-prep.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=iss style='color:#9aa6b2'>Detailed verdict not captured for this build (score + tier shown).</div></div><div class=jcard style="border-top:3px solid #4da3ff">
+<div class=jh><span class=arm style="color:#4da3ff">eph3</span><span class=cq><span class=g>8/10</span> Strong</span></div>
+<div class=slug>profit-estimator-2</div><div class=jid>1f545f48-600d-490e-a300-73f60e3503eb</div>
+<table class=m>
+<tr><td>ECU</td><td><b>10.14</b></td><td>Latency</td><td>15.8 min</td></tr>
+<tr><td>Steps</td><td>28</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>5.71 ✓</span></td><td>LLM calls</td><td>36</td></tr>
+</table>
+<a href="https://profit-estimator-2.internal.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=verdict>A clean, complete, well-structured mobile-first localStorage vendor profit app that covers every spec feature with readable code, though it ships no automated tests.</div><div class=iss><b>Issues:</b> No real tests (tests/__init__.py empty). num() silently coerces bad input to 0 with no negative-value guard beyond HTML min. Dashboard upcoming-event date filter is timezone-sensitive (new Date('YYYY-MM-DD')).</div></div></div><h2>P3 — Micro-Loans</h2><div class=grid3><div class=jcard style="border-top:3px solid #b07cff">
+<div class=jh><span class=arm style="color:#b07cff">Normal</span><span class=cq><span class=g>7/10</span> Acceptable</span></div>
+<div class=slug>rendoc-loans-4</div><div class=jid>a9dcb442-efb9-4695-a72d-59491ae35736</div>
+<table class=m>
+<tr><td>ECU</td><td><b>50.54</b></td><td>Latency</td><td>76.8 min</td></tr>
+<tr><td>Steps</td><td>81</td><td>Phases</td><td>4</td></tr>
+<tr><td>ECU@preview</td><td><span class='r'>18.84 ✗</span></td><td>LLM calls</td><td>93</td></tr>
+</table>
+<a href="https://rendoc-loans-4.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=iss style='color:#9aa6b2'>Detailed verdict not captured for this build (score + tier shown).</div></div><div class=jcard style="border-top:3px solid #43c59e">
+<div class=jh><span class=arm style="color:#43c59e">v2_credit_cap</span><span class=cq><span class=a>6/10</span> Mid</span></div>
+<div class=slug>rendoc-credit-1</div><div class=jid>e6316c6e-9808-4cc2-a9a1-2e2944103c4f</div>
+<table class=m>
+<tr><td>ECU</td><td><b>23.59</b></td><td>Latency</td><td>45.9 min</td></tr>
+<tr><td>Steps</td><td>60</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='r'>10.14 ✗</span></td><td>LLM calls</td><td>72</td></tr>
+</table>
+<a href="https://rendoc-credit-1.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=iss style='color:#9aa6b2'>Detailed verdict not captured for this build (score + tier shown).</div></div><div class=jcard style="border-top:3px solid #4da3ff">
+<div class=jh><span class=arm style="color:#4da3ff">eph3</span><span class=cq><span class=g>8/10</span> Strong</span></div>
+<div class=slug>micro-lend-hub</div><div class=jid>ca2824b6-39ce-49b2-822c-40f7996ce127</div>
+<table class=m>
+<tr><td>ECU</td><td><b>35.99</b></td><td>Latency</td><td>42.9 min</td></tr>
+<tr><td>Steps</td><td>59</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='r'>19.97 ✗</span></td><td>LLM calls</td><td>69</td></tr>
+</table>
+<a href="https://micro-lend-hub.internal.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=verdict>A comprehensive, well-architected micro-loans dashboard covering the full spec with clean modular routes, RBAC, risk scoring, and audit logging, held back mainly by CORS/secret hardening gaps.</div><div class=iss><b>Issues:</b> CORS allow_origins=* with allow_credentials=True (server.py:80-86); hardcoded JWT_SECRET fallback (auth.py:13); public /applications/intake unbounded; tests are live-URL integration only, no risk-engine unit tests.</div></div></div><h2>P4 — Laser-Engraving</h2><div class=grid3><div class=jcard style="border-top:3px solid #b07cff">
+<div class=jh><span class=arm style="color:#b07cff">Normal</span><span class=cq><span class=g>7.3/10</span> Strong</span></div>
+<div class=slug>custom-proof</div><div class=jid>c6e82396-1ad2-491a-94cc-353ea125af1a</div>
+<table class=m>
+<tr><td>ECU</td><td><b>17.31</b></td><td>Latency</td><td>45.9 min</td></tr>
+<tr><td>Steps</td><td>44</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>9.15 ✓</span></td><td>LLM calls</td><td>55</td></tr>
+</table>
+<a href="https://custom-proof.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=iss style='color:#9aa6b2'>Detailed verdict not captured for this build (score + tier shown).</div></div><div class=jcard style="border-top:3px solid #43c59e">
+<div class=jh><span class=arm style="color:#43c59e">v2_credit_cap</span><span class=cq><span class=g>7.7/10</span> Strong</span></div>
+<div class=slug>design-to-print-1</div><div class=jid>c613a210-a877-46d1-b6f6-48bbaa4637cc</div>
+<table class=m>
+<tr><td>ECU</td><td><b>17.82</b></td><td>Latency</td><td>28.4 min</td></tr>
+<tr><td>Steps</td><td>51</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>7.1 ✓</span></td><td>LLM calls</td><td>62</td></tr>
+</table>
+<a href="https://design-to-print-1.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=iss style='color:#9aa6b2'>Detailed verdict not captured for this build (score + tier shown).</div></div><div class=jcard style="border-top:3px solid #4da3ff">
+<div class=jh><span class=arm style="color:#4da3ff">eph3</span><span class=cq><span class=g>8/10</span> Strong</span></div>
+<div class=slug>design-engrave</div><div class=jid>cca55d13-6802-44f6-8b41-776128186f8d</div>
+<table class=m>
+<tr><td>ECU</td><td><b>19.04</b></td><td>Latency</td><td>35.9 min</td></tr>
+<tr><td>Steps</td><td>49</td><td>Phases</td><td>3</td></tr>
+<tr><td>ECU@preview</td><td><span class='r'>13.35 ✗</span></td><td>LLM calls</td><td>59</td></tr>
+</table>
+<a href="https://design-engrave.internal.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=verdict>A cohesive, well-architected laser-engraving customizer that covers nearly the full spec with a strong live 2D proof flow, production queue, and passing integration tests; main gap is server-side trust of client-supplied prices.</div><div class=iss><b>Issues:</b> Server trusts client unit_price/subtotal/total (models.py:93-101); CORS allow_origins=* with allow_credentials=True (server.py:240); default JWT secret in committed .env; GET /orders/{id} unauthenticated (server.py:169).</div></div></div><h2>P5 — Context Zero</h2><div class=grid3><div class=jcard style="border-top:3px solid #b07cff">
+<div class=jh><span class=arm style="color:#b07cff">Normal</span><span class=cq><span class=g>8/10</span> Strong</span></div>
+<div class=slug>dialogist-fight-1</div><div class=jid>2a70d9a3-3967-43dc-9e86-b8fbef821296</div>
+<table class=m>
+<tr><td>ECU</td><td><b>33.96</b></td><td>Latency</td><td>64.0 min</td></tr>
+<tr><td>Steps</td><td>86</td><td>Phases</td><td>2</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>8.9 ✓</span></td><td>LLM calls</td><td>94</td></tr>
+</table>
+<a href="https://dialogist-fight-1.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=verdict>A near-complete, well-structured 3D roguelike that covers nearly every spec system with clean code, held back only by zero automated tests and a few minor dead-code/misleading-UI bugs.</div><div class=iss><b>Issues:</b> No tests at all (empty tests dir, template test_result.md). Backend CORS '*' + allow_credentials (unused boilerplate). Dead code: unused dist2, empty gate-poll interval, magic-string 'gate' in castPrompt.</div></div><div class=jcard style="border-top:3px solid #43c59e">
+<div class=jh><span class=arm style="color:#43c59e">v2_credit_cap</span><span class=cq><span class=g>8/10</span> Strong</span></div>
+<div class=slug>context-zero-5</div><div class=jid>8da1a228-0b82-44ff-9c9d-8a61c10cc051</div>
+<table class=m>
+<tr><td>ECU</td><td><b>18.18</b></td><td>Latency</td><td>23.9 min</td></tr>
+<tr><td>Steps</td><td>33</td><td>Phases</td><td>1</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>9.4 ✓</span></td><td>LLM calls</td><td>38</td></tr>
+</table>
+<a href="https://context-zero-5.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=verdict>A near-complete, well-structured vertical slice that implements virtually the entire spec (movement, dodge, 4 weapons, 4 prompts, 3 enemy types, multi-phase Dialogist boss, pickups, dual upgrade shrine, Model Key gate, connected chambers, full HUD and menus) in clean R3F code, held back mainly by zero automated tests.</div><div class=iss><b>Issues:</b> .env committed and not gitignored (localhost Mongo only). CORS defaults to '*' with Allow-Credentials true. State bridged via window.__contextZero global. Dead pickup branches (memory/data never spawned).</div></div><div class=jcard style="border-top:3px solid #4da3ff">
+<div class=jh><span class=arm style="color:#4da3ff">eph3</span><span class=cq><span class=g>8/10</span> Strong</span></div>
+<div class=slug>escape-cathedral</div><div class=jid>905438cd-ef82-453e-92b8-356cd0769ce7</div>
+<table class=m>
+<tr><td>ECU</td><td><b>50.54</b></td><td>Latency</td><td>55.3 min</td></tr>
+<tr><td>Steps</td><td>116</td><td>Phases</td><td>2</td></tr>
+<tr><td>ECU@preview</td><td><span class='g'>9.55 ✓</span></td><td>LLM calls</td><td>124</td></tr>
+</table>
+<a href="https://escape-cathedral.internal.stage-preview.emergentagent.com" target=_blank>preview ↗</a><div class=verdict>A near-complete, cleanly architected R3F roguelike covering essentially every spec system (movement, dodge, 4 weapons, all prompts, 3 enemies, 4-phase boss, pickups, Data/Humanity shrines, key gate, HUD, full menus), held back only by zero automated tests.</div><div class=iss><b>Issues:</b> No tests (tests/ empty; only data-testid attrs). OPEN prompt unseals boss gate with no proximity check to the gate (Logic.jsx:262). Backend CORS allow_credentials with wildcard origins (server.py:72), though backend is unused by the game.</div></div></div>
+<div class=foot>ECU@preview ✓ = preview rendered within the 10-credit free cap. Latency = job duration. Detailed verdict shown where a structured review was captured (7/15); others show score + tier. Full data: MVP-Eval-3arm.xlsx · all 46 jobs: all-jobs.html</div>
+</div></body></html>
