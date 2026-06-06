@@ -1,0 +1,32 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>MVP-Phasing Eval — Charts</title><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#fff;--ink:#1a1f29;--mut:#646e7b;--line:#e4e8ee;--soft:#f7f9fc}
+*{box-sizing:border-box}body{margin:0;font:14px ui-sans-serif,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--soft)}
+.page{max-width:1000px;margin:22px auto;background:#fff;border:1px solid var(--line);border-radius:6px;padding:26px 30px 36px}
+h1{font-size:20px;margin:0 0 2px}.meta{color:var(--mut);font-size:12.5px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.box{border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.box h3{margin:0 0 8px;font-size:13px}.box .note{font-size:11px;color:var(--mut);margin-top:6px}
+@media(max-width:740px){.grid{grid-template-columns:1fr}}
+</style></head><body><div class=page>
+<h1>MVP-Phasing Eval — arm comparison</h1>
+<div class=meta>Normal (baseline) · v2_credit_cap · eph3 (long-prompt-1) · 46 jobs · 6 Jun 2026</div>
+<div class=grid>
+<div class=box><h3>Free-tier preview rate (preview ≤10 credits)</h3><canvas id=c1 height=180></canvas><div class=note>Higher = more free users see value. Both split arms beat baseline.</div></div>
+<div class=box><h3>Avg latency — job duration (min)</h3><canvas id=c2 height=180></canvas><div class=note>Lower = faster. Split arms are ~35–40% faster than baseline.</div></div>
+<div class=box><h3>Avg cost (ECU / job)</h3><canvas id=c3 height=180></canvas><div class=note>Lower = cheaper. v2 cheapest; eph3 ≈ Normal.</div></div>
+<div class=box><h3>Avg code quality (/10)</h3><canvas id=c4 height=180></canvas><div class=note>Higher = better build. eph3 highest; v2 lowest.</div></div>
+</div></div>
+<script>
+const L=['Normal','v2_credit_cap','eph3'];
+const C=['#b07cff','#43c59e','#4da3ff'];
+function bar(id,data,suffix,max){new Chart(document.getElementById(id),{type:'bar',data:{labels:L,datasets:[{data,backgroundColor:C,borderRadius:4}]},
+options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+(suffix||'')}}},
+scales:{y:{beginAtZero:true,max:max,ticks:{color:'#646e7b'},grid:{color:'#eef1f6'}},x:{ticks:{color:'#1a1f29',font:{size:12}},grid:{display:false}}},
+animation:false}});}
+bar('c1',[53,77,70],'%',100);
+bar('c2',[50.1,30.0,32.6],' min');
+bar('c3',[23.9,16.7,22.4],' ECU');
+bar('c4',[7.23,6.55,7.71],'/10',10);
+</script></body></html>
