@@ -1,0 +1,304 @@
+<!doctype html><html><head><meta charset=utf-8><title>MVP-Phasing Prompt Eval</title>
+<script src=https://cdn.jsdelivr.net/npm/chart.js></script><style>
+:root{--bg:#0f1419;--card:#1a2027;--tx:#e6e6e6;--mut:#8a96a3;--bd:#2a323c;--e1:#b07cff;--e2:#43c59e;--pos:#43c59e;--neg:#ff6b6b;--warn:#f0a830}
+body.light{--bg:#f5f7fa;--card:#fff;--tx:#1a2027;--mut:#5a6573;--bd:#dde3ea}
+*{box-sizing:border-box}body{margin:0;font:13px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx)}html{scroll-behavior:smooth}
+.sidebar{position:fixed;top:0;left:0;width:210px;height:100vh;background:var(--card);border-right:1px solid var(--bd);padding:20px 12px;overflow:auto;z-index:8}
+.sidebar .t{font-weight:700;font-size:14px;margin-bottom:12px}.sidebar a{display:block;color:var(--mut);text-decoration:none;padding:5px 9px;border-radius:6px;font-size:12px}
+.sidebar a:hover{background:rgba(255,255,255,.06);color:var(--tx)}.sidebar a.head{color:var(--tx);font-weight:700;margin-top:12px}.sidebar a.sub{padding-left:20px}
+.wrap{margin-left:210px;max-width:1040px;padding:24px 30px}
+h1{font-size:23px;margin:0 0 2px}h2{font-size:18px;border-bottom:2px solid var(--bd);padding-bottom:6px;margin-top:30px;scroll-margin-top:10px}h3{margin:18px 0 7px;scroll-margin-top:10px}
+.legend span{margin-right:14px;font-size:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+.verdict{background:linear-gradient(90deg,rgba(67,197,158,.12),rgba(176,124,255,.10));border:1px solid var(--bd);border-left:4px solid var(--e2);border-radius:10px;padding:16px 18px;margin:16px 0}
+.verdict b{color:var(--tx)}.verdict .h{font-size:15px;font-weight:700;margin-bottom:6px}
+table{width:100%;border-collapse:collapse;margin:6px 0 12px;font-size:12.5px}th,td{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center}th{color:var(--mut);font-weight:600}td:first-child,th:first-child{text-align:left}
+.glance td{font-weight:600}.winN{background:rgba(176,124,255,.20);color:var(--e1)}.win2{background:rgba(67,197,158,.20);color:var(--e2)}.wint{background:rgba(240,168,48,.15);color:var(--warn)}
+.kpis{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}.kpi{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;flex:1;min-width:140px}.kpi .b{font-size:22px;font-weight:700;color:var(--pos)}.kpi .l{color:var(--mut);font-size:11px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;margin:14px 0}.pos{color:var(--pos);font-weight:700}.neg{color:var(--neg);font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.ephbox{background:var(--card);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.ephhdr{padding:7px 11px;font-weight:700}.ephhdr.e1{background:rgba(176,124,255,.16);color:var(--e1)}.ephhdr.e2{background:rgba(67,197,158,.16);color:var(--e2)}.ephbox table{margin:0}tr.best{background:rgba(67,197,158,.12);font-weight:600}
+.toggle{position:fixed;top:12px;right:12px;background:var(--card);border:1px solid var(--bd);color:var(--tx);border-radius:7px;padding:5px 11px;cursor:pointer;z-index:9}
+details{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px 14px;margin:10px 0}summary{cursor:pointer;font-size:15px;padding:3px 0}
+.jc{border:1px solid var(--bd);border-radius:9px;padding:10px 12px;margin:9px 0}.jch{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:6px}.sl{font-weight:700;font-size:14px}
+.jid{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--mut)}.pill{font-size:10px;padding:1px 7px;border-radius:5px}.pill.e1{background:rgba(176,124,255,.18);color:var(--e1)}.pill.e2{background:rgba(67,197,158,.18);color:var(--e2)}
+.mini{font-size:11.5px;margin:3px 0}.mini th{font-size:10.5px}.cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:6px}.ct{font-size:11px;color:var(--mut);font-weight:600;margin-bottom:2px}.mod{font-size:11px;color:var(--mut);margin-top:5px}
+.note{color:var(--mut);font-size:11.5px}@media(max-width:820px){.sidebar{display:none}.wrap{margin-left:0}.cols{grid-template-columns:1fr}}
+</style></head><body>
+<button class=toggle onclick="document.body.classList.toggle('light')">◐</button>
+<nav class=sidebar><div class=t>MVP Prompt Eval</div>
+<a class=head href="#top">⌂ At a glance</a>
+<a class=head href="#sec1">① Comparison</a><a class=sub href="#s1-P1">P1 Task</a><a class=sub href="#s1-P2">P2 PopUp</a><a class=sub href="#s1-P3">P3 Loans</a><a class=sub href="#s1-P4">P4 Laser</a>
+<a class=head href="#sec2">② Trajectory data</a><a class=sub href="#s2-P1">P1 Task</a><a class=sub href="#s2-P2">P2 PopUp</a><a class=sub href="#s2-P3">P3 Loans</a><a class=sub href="#s2-P4">P4 Laser</a>
+</nav>
+<div class=wrap id=top>
+<h1>MVP-Phasing Prompt Eval — Normal vs v2_credit_cap</h1>
+<div class=legend><span><span class="dot" style="background:var(--e1)"></span>Normal Prompt (gflash) — agent self-scopes</span><span><span class="dot" style="background:var(--e2)"></span>v2_credit_cap (long-prompt) — MVP-split + 10-credit cap</span></div>
+<div class=verdict><div class=h>Bottom line</div>
+<b>v2_credit_cap</b> cuts ECU on P1–P3 (−22% to −56%) and runs faster, but it's a real tradeoff: on the complex Task app (P1) it ships a <b>thin</b> build (quality 4.0 vs 6.7) and on the Laser app (P4) it actually costs <b>26% MORE</b> with no quality gain. Only P2 (small app) and P3 (large dashboard) are clean wins — equal/comparable quality at lower cost.</div>
+<table class=glance><tr><th>Prompt</th><th>ECU N/v2</th><th>ECU verdict</th><th>Qual N/v2</th><th>Quality</th><th>Overall call</th></tr><tr><td><b>P1</b> Task Management</td><td>23.74 / 16.4</td><td class=win2>−31% → v2</td><td>6.7 / 4.0</td><td>Normal</td><td class=win2>tradeoff — v2 cheaper but lower quality</td></tr><tr><td><b>P2</b> PopUp Profit</td><td>10.09 / 7.86</td><td class=win2>−22% → v2</td><td>8.0 / 8.0</td><td>tie</td><td class=win2>v2 — cheaper, equal quality</td></tr><tr><td><b>P3</b> Micro-Loans</td><td>45.31 / 19.99</td><td class=win2>−56% → v2</td><td>6.3 / 6.0</td><td>tie</td><td class=win2>v2 — cheaper, equal quality</td></tr><tr><td><b>P4</b> Laser-Engraving</td><td>16.23 / 20.38</td><td class=winN>+26% → Normal</td><td>7.2 / 6.9</td><td>tie</td><td class=winN>Normal — v2 cost MORE, no quality gain</td></tr></table>
+
+<h2 id=sec1>① Comparison Summary</h2>
+<div class=kpis>
+<div class=kpi><div class=b>−32%</div><div class=l>v2 total ECU vs Normal (P1–P4)</div></div>
+<div class=kpi><div class=b style="color:var(--warn)">4.0 vs 6.7</div><div class=l>P1 quality: v2 vs Normal</div></div>
+<div class=kpi><div class=b style="color:var(--neg)">+26%</div><div class=l>P4 ECU: v2 vs Normal (worse)</div></div>
+<div class=kpi><div class=b>27</div><div class=l>builds analysed</div></div></div>
+<div class=card><canvas id=c1 height=80></canvas></div>
+<div class=card><table><tr><th>Prompt</th><th>ECU N</th><th>ECU v2</th><th>Δ</th><th>Q N</th><th>Q v2</th><th>Lat N</th><th>Lat v2</th></tr><tr><td>P1 Task Management</td><td>23.74</td><td>16.4</td><td class=pos>−31%</td><td>6.7</td><td>4.0</td><td>46.63</td><td>30.83</td></tr><tr><td>P2 PopUp Profit</td><td>10.09</td><td>7.86</td><td class=pos>−22%</td><td>8.0</td><td>8.0</td><td>34.1</td><td>18.9</td></tr><tr><td>P3 Micro-Loans</td><td>45.31</td><td>19.99</td><td class=pos>−56%</td><td>6.3</td><td>6.0</td><td>66.8</td><td>42.97</td></tr><tr><td>P4 Laser-Engraving</td><td>16.23</td><td>20.38</td><td class=neg>+26%</td><td>7.2</td><td>6.9</td><td>51.83</td><td>31.75</td></tr></table></div>
+<h3 id="s1-P1">P1 — Task Management</h3><div class=grid2><div class=ephbox><div class="ephhdr e1">Normal Prompt · 3 runs</div><table><tr><th>Job</th><th>ECU</th><th>min</th><th>Phases</th><th>Q</th></tr><tr class=best><td>★ task-flow-57</td><td>19.48</td><td>42.1</td><td>3</td><td>7/10</td></tr><tr><td>project-sync</td><td>28.57</td><td>50.4</td><td>4</td><td>6/10</td></tr><tr><td>kanban-sync</td><td>23.16</td><td>47.4</td><td>3</td><td>7/10</td></tr></table></div><div class=ephbox><div class="ephhdr e2">v2_credit_cap · 3 runs</div><table><tr><th>Job</th><th>ECU</th><th>min</th><th>Phases</th><th>Q</th></tr><tr><td>project-hub-25</td><td>16.35</td><td>28.8</td><td>3</td><td>4/10</td></tr><tr class=best><td>★ workflow-central-2</td><td>15.97</td><td>28.3</td><td>4</td><td>4/10</td></tr><tr><td>teamtask-1</td><td>16.88</td><td>35.4</td><td>4</td><td>4/10</td></tr></table></div></div><h3 id="s1-P2">P2 — PopUp Profit</h3><div class=grid2><div class=ephbox><div class="ephhdr e1">Normal Prompt · 3 runs</div><table><tr><th>Job</th><th>ECU</th><th>min</th><th>Phases</th><th>Q</th></tr><tr><td>know-before-show-1</td><td>11.26</td><td>36.1</td><td>3</td><td>8/10</td></tr><tr class=best><td>★ event-profit-hub</td><td>7.84</td><td>30.8</td><td>3</td><td>8/10</td></tr><tr><td>booth-planner-1</td><td>11.18</td><td>35.4</td><td>3</td><td>8/10</td></tr></table></div><div class=ephbox><div class="ephhdr e2">v2_credit_cap · 3 runs</div><table><tr><th>Job</th><th>ECU</th><th>min</th><th>Phases</th><th>Q</th></tr><tr><td>profit-prep</td><td>8.3</td><td>19.4</td><td>3</td><td>8/10</td></tr><tr><td>know-before-show-2</td><td>7.7</td><td>18.7</td><td>3</td><td>8/10</td></tr><tr class=best><td>★ vendor-calculator-4</td><td>7.57</td><td>18.6</td><td>3</td><td>8/10</td></tr></table></div></div><h3 id="s1-P3">P3 — Micro-Loans</h3><div class=grid2><div class=ephbox><div class="ephhdr e1">Normal Prompt · 3 runs</div><table><tr><th>Job</th><th>ECU</th><th>min</th><th>Phases</th><th>Q</th></tr><tr class=best><td>★ rendoc-loans-4</td><td>50.54</td><td>76.8</td><td>4</td><td>7/10</td></tr><tr><td>micro-lending-hub</td><td>43.69</td><td>61.5</td><td>3</td><td>6/10</td></tr><tr><td>credit-control</td><td>41.69</td><td>62.1</td><td>3</td><td>6/10</td></tr></table></div><div class=ephbox><div class="ephhdr e2">v2_credit_cap · 3 runs</div><table><tr><th>Job</th><th>ECU</th><th>min</th><th>Phases</th><th>Q</th></tr><tr class=best><td>★ micro-loans-admin</td><td>17.21</td><td>40.1</td><td>3</td><td>6/10</td></tr><tr><td>rendoc-credit-1</td><td>23.59</td><td>45.9</td><td>3</td><td>6/10</td></tr><tr><td>rendoc-portfolio</td><td>19.16</td><td>42.9</td><td>2</td><td>6/10</td></tr></table></div></div><h3 id="s1-P4">P4 — Laser-Engraving</h3><div class=grid2><div class=ephbox><div class="ephhdr e1">Normal Prompt · 3 runs</div><table><tr><th>Job</th><th>ECU</th><th>min</th><th>Phases</th><th>Q</th></tr><tr><td>vector-create</td><td>10.6</td><td>39.3</td><td>3</td><td>7.0/10</td></tr><tr><td>engrave-studio-3</td><td>20.78</td><td>70.3</td><td>3</td><td>7.2/10</td></tr><tr class=best><td>★ custom-proof</td><td>17.31</td><td>45.9</td><td>3</td><td>7.3/10</td></tr></table></div><div class=ephbox><div class="ephhdr e2">v2_credit_cap · 6 runs</div><table><tr><th>Job</th><th>ECU</th><th>min</th><th>Phases</th><th>Q</th></tr><tr><td>engrave-studio-4</td><td>22.01</td><td>29.2</td><td>3</td><td>6.0/10</td></tr><tr><td>personalize-now</td><td>17.22</td><td>28.4</td><td>2</td><td>6.5/10</td></tr><tr><td>create-ship-direct</td><td>20.74</td><td>31.2</td><td>4</td><td>7.0/10</td></tr><tr><td>engrave-studio-5</td><td>21.21</td><td>34.0</td><td>4</td><td>6.5/10</td></tr><tr><td>custom-maker</td><td>23.27</td><td>39.3</td><td>4</td><td>7.6/10</td></tr><tr class=best><td>★ design-to-print-1</td><td>17.82</td><td>28.4</td><td>3</td><td>7.7/10</td></tr></table></div></div>
+
+<h2 id=sec2>② Trajectory Data (per job, verified from DB)</h2>
+<div class=note>Each job walked step-by-step: phase cost curve = cumulative ECU at every <code>finish</code> action (Δ = that phase's cost); agent/sub-agent step spans from <code>trajectories.expertise_type</code>; sub-agent runs + output tokens + tool calls from <code>llm_logs_partitioned</code>. Full non-truncated job_id shown.</div>
+<details id="s2-P1"><summary><b>P1 — Task Management</b> · 6 jobs</summary><div class=jc>
+<div class=jch><span class=sl>task-flow-57</span> <span class="pill e1">Normal Prompt</span> <span class=jid>a2df4e68-83bd-4592-a8da-9c68ee369805</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>19.48</b></td><td>$5.84</td><td>47</td><td>42.1</td><td>3</td><td>79</td><td>35</td><td>7/10 Acceptable</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.85</td><td>+0.85</td></tr><tr><td>finish 2</td><td>41</td><td>17.24</td><td>+16.39</td></tr><tr><td>finish 3</td><td>45</td><td>19.48</td><td>+2.24</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>29</td><td>0–45</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>14</td><td>28–41</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hv8iq9io6g00a36vq0</td><td>14</td><td>12,947</td></tr><tr><td>_d8hv04a9io6g00a36i3g</td><td>3</td><td>2,795</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×43, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>project-sync</span> <span class="pill e1">Normal Prompt</span> <span class=jid>ff6d38e3-a7ba-4be7-9bd3-d068b3bc040e</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>28.57</b></td><td>$8.6</td><td>67</td><td>50.4</td><td>4</td><td>100</td><td>34</td><td>6/10 Acceptable</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>1.04</td><td>+1.04</td></tr><tr><td>finish 2</td><td>42</td><td>16.41</td><td>+15.37</td></tr><tr><td>finish 3</td><td>60</td><td>23.99</td><td>+7.58</td></tr><tr><td>finish 4</td><td>65</td><td>28.57</td><td>+4.58</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>28</td><td>0–65</td></tr><tr><td>design</td><td>3</td><td>3–5</td></tr><tr><td>testing</td><td>35</td><td>23–60</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hv8i29io6g00a36vn0</td><td>20</td><td>19,591</td></tr><tr><td>_d8hvbca9io6g00a3744g</td><td>15</td><td>21,489</td></tr><tr><td>_d8hv2h29io6g00a36k7g</td><td>3</td><td>2,500</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×63, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>kanban-sync</span> <span class="pill e1">Normal Prompt</span> <span class=jid>98e5fd48-b954-47b2-8a64-706094b79e4e</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>23.16</b></td><td>$6.96</td><td>58</td><td>47.4</td><td>3</td><td>88</td><td>44</td><td>7/10 Acceptable</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>0.98</td><td>+0.98</td></tr><tr><td>finish 2</td><td>51</td><td>20.73</td><td>+19.75</td></tr><tr><td>finish 3</td><td>56</td><td>23.16</td><td>+2.43</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>39</td><td>0–56</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>14</td><td>38–51</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hvbpa9io6g00a374gg</td><td>14</td><td>12,263</td></tr><tr><td>_d8hv0vq9io6g00a36ihg</td><td>4</td><td>2,877</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×53, gemini-3.1-pro×4</div></div><div class=jc>
+<div class=jch><span class=sl>project-hub-25</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>2af8df68-1bb9-45bb-ad38-5b7456f0184e</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>16.35</b></td><td>$4.89</td><td>42</td><td>28.8</td><td>3</td><td>67</td><td>29</td><td>4/10 Weak</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.88</td><td>+0.88</td></tr><tr><td>finish 2</td><td>29</td><td>10.46</td><td>+9.58</td></tr><tr><td>finish 3</td><td>40</td><td>16.35</td><td>+5.89</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>24</td><td>0–40</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>14</td><td>16–29</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hvtqa9io6g0095gbu0</td><td>14</td><td>17,072</td></tr><tr><td>_d8hvokq9io6g0095g7cg</td><td>3</td><td>2,335</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×38, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>workflow-central-2</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>f1959bd6-230e-4e47-86b3-305691d8be15</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>15.97</b></td><td>$4.78</td><td>48</td><td>28.3</td><td>4</td><td>73</td><td>25</td><td>4/10 Weak</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.86</td><td>+0.86</td></tr><tr><td>finish 2</td><td>29</td><td>9.66</td><td>+8.8</td></tr><tr><td>finish 3</td><td>43</td><td>14.8</td><td>+5.14</td></tr><tr><td>finish 4</td><td>46</td><td>15.97</td><td>+1.17</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>20</td><td>0–46</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>24</td><td>16–43</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hvt1q9io6g0095gamg</td><td>14</td><td>22,427</td></tr><tr><td>_d8i00n29io6g0095gfc0</td><td>10</td><td>8,650</td></tr><tr><td>_d8hvomq9io6g0095g7eg</td><td>3</td><td>2,862</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×44, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>teamtask-1</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>75c54a5b-5bea-4208-bd55-be080c7f4ba1</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>16.88</b></td><td>$5.06</td><td>49</td><td>35.4</td><td>4</td><td>64</td><td>28</td><td>4/10 Weak</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>0.98</td><td>+0.98</td></tr><tr><td>finish 2</td><td>38</td><td>10.89</td><td>+9.91</td></tr><tr><td>finish 3</td><td>43</td><td>13.73</td><td>+2.84</td></tr><tr><td>finish 4</td><td>47</td><td>16.88</td><td>+3.15</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>22</td><td>0–47</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>21</td><td>18–38</td></tr><tr><td>support_agent_sonn</td><td>1</td><td>43–43</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i02029io6g0095gho0</td><td>21</td><td>17,307</td></tr><tr><td>_d8hvooq9io6g0095g7gg</td><td>4</td><td>2,242</td></tr><tr><td>_d8i057a9io6g0095gkt0</td><td>1</td><td>640</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×43, gemini-3.1-pro×4, sonnet-4-5-20250929×1</div></div></details><details id="s2-P2"><summary><b>P2 — PopUp Profit</b> · 6 jobs</summary><div class=jc>
+<div class=jch><span class=sl>know-before-show-1</span> <span class="pill e1">Normal Prompt</span> <span class=jid>fd6a87d5-e834-4615-8f12-8c22a74347b8</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>11.26</b></td><td>$3.35</td><td>26</td><td>36.1</td><td>3</td><td>46</td><td>22</td><td>8/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>1.05</td><td>+1.05</td></tr><tr><td>finish 2</td><td>19</td><td>8.68</td><td>+7.63</td></tr><tr><td>finish 3</td><td>24</td><td>11.26</td><td>+2.58</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>17</td><td>0–24</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>5</td><td>15–19</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hv58a9io6g00a36o60</td><td>5</td><td>12,215</td></tr><tr><td>_d8hv22a9io6g00a36j8g</td><td>3</td><td>2,844</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×22, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>event-profit-hub</span> <span class="pill e1">Normal Prompt</span> <span class=jid>31a35f59-0b54-4ab0-8460-be07012901e6</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>7.84</b></td><td>$2.32</td><td>22</td><td>30.8</td><td>3</td><td>37</td><td>19</td><td>8/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.72</td><td>+0.72</td></tr><tr><td>finish 2</td><td>16</td><td>6.61</td><td>+5.89</td></tr><tr><td>finish 3</td><td>20</td><td>7.84</td><td>+1.23</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>13</td><td>0–20</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>5</td><td>12–16</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hv59q9io6g00a36ob0</td><td>5</td><td>7,289</td></tr><tr><td>_d8hv24q9io6g00a36jdg</td><td>3</td><td>2,029</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×18, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>booth-planner-1</span> <span class="pill e1">Normal Prompt</span> <span class=jid>4cab5e8a-39c6-47d5-805b-6756f86090dc</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>11.18</b></td><td>$3.33</td><td>28</td><td>35.4</td><td>3</td><td>45</td><td>23</td><td>8/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.81</td><td>+0.81</td></tr><tr><td>finish 2</td><td>20</td><td>7.49</td><td>+6.68</td></tr><tr><td>finish 3</td><td>26</td><td>11.18</td><td>+3.69</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>18</td><td>0–26</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>6</td><td>15–20</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hv5bq9io6g00a36om0</td><td>6</td><td>15,630</td></tr><tr><td>_d8hv28q9io6g00a36jmg</td><td>3</td><td>2,782</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×24, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>profit-prep</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>7ab9ef6a-3586-4df7-bf9d-b3be3670426a</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>8.3</b></td><td>$2.46</td><td>29</td><td>19.4</td><td>3</td><td>47</td><td>23</td><td>8/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>0.96</td><td>+0.96</td></tr><tr><td>finish 2</td><td>22</td><td>6.83</td><td>+5.87</td></tr><tr><td>finish 3</td><td>27</td><td>8.3</td><td>+1.47</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>17</td><td>0–27</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>7</td><td>16–22</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hvt4q9io6g0095gatg</td><td>7</td><td>7,134</td></tr><tr><td>_d8hvq3i9io6g0095g81g</td><td>4</td><td>1,652</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×24, gemini-3.1-pro×4</div></div><div class=jc>
+<div class=jch><span class=sl>know-before-show-2</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>3645cff0-1c3c-438b-a46a-a5bd9016a351</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>7.7</b></td><td>$2.27</td><td>23</td><td>18.7</td><td>3</td><td>38</td><td>19</td><td>8/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.8</td><td>+0.8</td></tr><tr><td>finish 2</td><td>15</td><td>6.2</td><td>+5.4</td></tr><tr><td>finish 3</td><td>21</td><td>7.7</td><td>+1.5</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>14</td><td>0–21</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>5</td><td>11–15</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hvspa9io6g0095ga7g</td><td>5</td><td>7,559</td></tr><tr><td>_d8hvpva9io6g0095g7ug</td><td>3</td><td>2,375</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×19, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>vendor-calculator-4</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>51d60426-a963-4471-a2b0-5f4635206075</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>7.57</b></td><td>$2.23</td><td>23</td><td>18.6</td><td>3</td><td>38</td><td>18</td><td>8/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>0.8</td><td>+0.8</td></tr><tr><td>finish 2</td><td>18</td><td>6.54</td><td>+5.74</td></tr><tr><td>finish 3</td><td>21</td><td>7.57</td><td>+1.03</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>13</td><td>0–21</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>5</td><td>14–18</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hvt5q9io6g0095gb20</td><td>5</td><td>8,057</td></tr><tr><td>_d8hvq7q9io6g0095g84g</td><td>4</td><td>2,170</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×18, gemini-3.1-pro×4</div></div></details><details id="s2-P3"><summary><b>P3 — Micro-Loans</b> · 6 jobs</summary><div class=jc>
+<div class=jch><span class=sl>rendoc-loans-4</span> <span class="pill e1">Normal Prompt</span> <span class=jid>a9dcb442-efb9-4695-a72d-59491ae35736</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>50.54</b></td><td>$15.26</td><td>81</td><td>76.8</td><td>4</td><td>111</td><td>52</td><td>7/10 Acceptable</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>1.19</td><td>+1.19</td></tr><tr><td>finish 2</td><td>49</td><td>24.52</td><td>+23.33</td></tr><tr><td>finish 3</td><td>70</td><td>43.89</td><td>+19.37</td></tr><tr><td>finish 4</td><td>79</td><td>50.54</td><td>+6.65</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>45</td><td>0–79</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>31</td><td>31–70</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hveoq9io6g00a378pg</td><td>19</td><td>19,201</td></tr><tr><td>_d8hvoda9io6g00a37gu0</td><td>12</td><td>15,492</td></tr><tr><td>_d8hv3ki9io6g00a36lq0</td><td>4</td><td>2,348</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×76, gemini-3.1-pro×4</div></div><div class=jc>
+<div class=jch><span class=sl>micro-lending-hub</span> <span class="pill e1">Normal Prompt</span> <span class=jid>44afcf0c-116b-4f92-81aa-c5c636a89b06</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>43.69</b></td><td>$13.18</td><td>77</td><td>61.5</td><td>3</td><td>117</td><td>52</td><td>6/10 Mid</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>8</td><td>1.15</td><td>+1.15</td></tr><tr><td>finish 2</td><td>62</td><td>30.75</td><td>+29.6</td></tr><tr><td>finish 3</td><td>75</td><td>43.69</td><td>+12.94</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>45</td><td>0–75</td></tr><tr><td>design</td><td>7</td><td>2–8</td></tr><tr><td>testing</td><td>24</td><td>39–62</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hvgt29io6g00a37bhg</td><td>24</td><td>19,795</td></tr><tr><td>_d8hv3qa9io6g00a36m10</td><td>7</td><td>3,540</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×69, gemini-3.1-pro×7</div></div><div class=jc>
+<div class=jch><span class=sl>credit-control</span> <span class="pill e1">Normal Prompt</span> <span class=jid>e16f0c6a-99c9-44f5-adca-1def18073f05</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>41.69</b></td><td>$12.57</td><td>97</td><td>62.1</td><td>3</td><td>139</td><td>59</td><td>6/10 Mid</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>1.64</td><td>+1.64</td></tr><tr><td>finish 2</td><td>67</td><td>24.88</td><td>+23.24</td></tr><tr><td>finish 3</td><td>95</td><td>41.69</td><td>+16.81</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>52</td><td>0–95</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>40</td><td>28–67</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hve4i9io6g00a377qg</td><td>40</td><td>29,794</td></tr><tr><td>_d8hv3ri9io6g00a36m40</td><td>4</td><td>2,634</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×92, gemini-3.1-pro×4</div></div><div class=jc>
+<div class=jch><span class=sl>micro-loans-admin</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>0cfaeb9d-39fe-45ae-8f6b-fa8fa1439285</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>17.21</b></td><td>$5.16</td><td>31</td><td>40.1</td><td>3</td><td>55</td><td>17</td><td>6/10 Mid</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.94</td><td>+0.94</td></tr><tr><td>finish 2</td><td>26</td><td>13.34</td><td>+12.4</td></tr><tr><td>finish 3</td><td>29</td><td>17.21</td><td>+3.87</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>11</td><td>0–29</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>16</td><td>11–26</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i070a9io6g0095gmv0</td><td>16</td><td>16,134</td></tr><tr><td>_d8i00629io6g0095geo0</td><td>3</td><td>2,812</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×27, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>rendoc-credit-1</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>e6316c6e-9808-4cc2-a9a1-2e2944103c4f</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>23.59</b></td><td>$7.09</td><td>60</td><td>45.9</td><td>3</td><td>100</td><td>31</td><td>6/10 Mid</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>0.9</td><td>+0.9</td></tr><tr><td>finish 2</td><td>47</td><td>16.87</td><td>+15.97</td></tr><tr><td>finish 3</td><td>58</td><td>23.59</td><td>+6.72</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>24</td><td>0–58</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>31</td><td>17–47</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i07va9io6g0095gpd0</td><td>31</td><td>23,602</td></tr><tr><td>_d8i00da9io6g0095gevg</td><td>4</td><td>2,295</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×55, gemini-3.1-pro×4</div></div><div class=jc>
+<div class=jch><span class=sl>rendoc-portfolio</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>9dec0190-7d4d-4704-bb6b-dff6fa7a9b5b</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>19.16</b></td><td>$5.75</td><td>43</td><td>42.9</td><td>2</td><td>76</td><td>24</td><td>6/10 Mid</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>1.03</td><td>+1.03</td></tr><tr><td>finish 2</td><td>33</td><td>14.06</td><td>+13.03</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>18</td><td>0–41</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>20</td><td>14–33</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i071q9io6g0095gn20</td><td>20</td><td>20,818</td></tr><tr><td>_d8i00ja9io6g0095gf90</td><td>4</td><td>2,865</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×38, gemini-3.1-pro×4</div></div></details><details id="s2-P4"><summary><b>P4 — Laser-Engraving</b> · 9 jobs</summary><div class=jc>
+<div class=jch><span class=sl>vector-create</span> <span class="pill e1">Normal Prompt</span> <span class=jid>20d5657d-93fd-4562-b875-0b93c31a9cfc</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>10.6</b></td><td>$3.15</td><td>30</td><td>39.3</td><td>3</td><td>52</td><td>20</td><td>7.0/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.97</td><td>+0.97</td></tr><tr><td>finish 2</td><td>25</td><td>9.4</td><td>+8.43</td></tr><tr><td>finish 3</td><td>28</td><td>10.6</td><td>+1.2</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>15</td><td>0–28</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>11</td><td>15–25</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hv9bi9io6g00a37160</td><td>11</td><td>9,229</td></tr><tr><td>_d8hv4ma9io6g00a36n80</td><td>3</td><td>2,085</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×26, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>engrave-studio-3</span> <span class="pill e1">Normal Prompt</span> <span class=jid>10cfb936-5fbd-4198-a08e-b42de12431f2</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>20.78</b></td><td>$6.24</td><td>54</td><td>70.3</td><td>3</td><td>71</td><td>26</td><td>7.2/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>10</td><td>1.2</td><td>+1.2</td></tr><tr><td>finish 2</td><td>48</td><td>17.38</td><td>+16.18</td></tr><tr><td>finish 3</td><td>52</td><td>20.78</td><td>+3.4</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>20</td><td>0–52</td></tr><tr><td>design</td><td>9</td><td>2–10</td></tr><tr><td>testing</td><td>24</td><td>25–48</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hvhgi9io6g00a37c9g</td><td>25</td><td>17,909</td></tr><tr><td>_d8hv5129io6g00a36nt0</td><td>9</td><td>2,955</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×44, gemini-3.1-pro×9</div></div><div class=jc>
+<div class=jch><span class=sl>custom-proof</span> <span class="pill e1">Normal Prompt</span> <span class=jid>c6e82396-1ad2-491a-94cc-353ea125af1a</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>17.31</b></td><td>$5.18</td><td>44</td><td>45.9</td><td>3</td><td>74</td><td>26</td><td>7.3/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>0.98</td><td>+0.98</td></tr><tr><td>finish 2</td><td>38</td><td>13.36</td><td>+12.38</td></tr><tr><td>finish 3</td><td>42</td><td>17.31</td><td>+3.95</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>19</td><td>0–42</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>20</td><td>19–38</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8hvb6q9io6g00a373sg</td><td>20</td><td>18,526</td></tr><tr><td>_d8hv4ui9io6g00a36nq0</td><td>4</td><td>3,018</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×39, gemini-3.1-pro×4</div></div><div class=jc>
+<div class=jch><span class=sl>engrave-studio-4</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>5746d87e-06c6-42ef-a858-b0fa7ee02ca7</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>22.01</b></td><td>$6.61</td><td>62</td><td>29.2</td><td>3</td><td>86</td><td>41</td><td>6.0/10 Mid</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>6</td><td>1.0</td><td>+1.0</td></tr><tr><td>finish 2</td><td>54</td><td>17.29</td><td>+16.29</td></tr><tr><td>finish 3</td><td>60</td><td>22.01</td><td>+4.72</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>36</td><td>0–60</td></tr><tr><td>design</td><td>4</td><td>3–6</td></tr><tr><td>testing</td><td>21</td><td>34–54</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i08ma9io6g0095gqk0</td><td>21</td><td>17,334</td></tr><tr><td>_d8i02na9io6g0095gj00</td><td>4</td><td>3,445</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×57, gemini-3.1-pro×4</div></div><div class=jc>
+<div class=jch><span class=sl>personalize-now</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>2cfa1b95-5155-46c5-bd0a-be1220925b62</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>17.22</b></td><td>$5.16</td><td>42</td><td>28.4</td><td>2</td><td>67</td><td>21</td><td>6.5/10 Mid</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>6</td><td>1.05</td><td>+1.05</td></tr><tr><td>finish 2</td><td>34</td><td>13.08</td><td>+12.03</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>16</td><td>0–40</td></tr><tr><td>design</td><td>5</td><td>2–6</td></tr><tr><td>testing</td><td>20</td><td>15–34</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i06i29io6g0095gm40</td><td>20</td><td>25,621</td></tr><tr><td>_d8i015a9io6g0095gg80</td><td>5</td><td>2,153</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×36, gemini-3.1-pro×5</div></div><div class=jc>
+<div class=jch><span class=sl>create-ship-direct</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>ea163e4a-c6e4-493e-a996-0979f20bacc9</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>20.74</b></td><td>$6.23</td><td>54</td><td>31.2</td><td>4</td><td>80</td><td>26</td><td>7.0/10 Solid</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>6</td><td>1.0</td><td>+1.0</td></tr><tr><td>finish 2</td><td>32</td><td>11.51</td><td>+10.51</td></tr><tr><td>finish 3</td><td>48</td><td>17.24</td><td>+5.73</td></tr><tr><td>finish 4</td><td>52</td><td>20.74</td><td>+3.5</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>21</td><td>0–52</td></tr><tr><td>design</td><td>5</td><td>2–6</td></tr><tr><td>testing</td><td>27</td><td>18–48</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i06pi9io6g0095gmn0</td><td>15</td><td>19,833</td></tr><tr><td>_d8i0a5q9io6g0095gtv0</td><td>12</td><td>15,014</td></tr><tr><td>_d8i017q9io6g0095ggc0</td><td>5</td><td>3,130</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×48, gemini-3.1-pro×5</div></div><div class=jc>
+<div class=jch><span class=sl>engrave-studio-5</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>d44d2c97-0a9f-4a85-b8fe-6e7fff6e2fa8</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>21.21</b></td><td>$6.37</td><td>73</td><td>34.0</td><td>4</td><td>101</td><td>33</td><td>6.5/10 Mid</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.89</td><td>+0.89</td></tr><tr><td>finish 2</td><td>42</td><td>12.43</td><td>+11.54</td></tr><tr><td>finish 3</td><td>67</td><td>19.59</td><td>+7.16</td></tr><tr><td>finish 4</td><td>71</td><td>21.21</td><td>+1.62</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>28</td><td>0–71</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>41</td><td>18–67</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i07229io6g0095gn40</td><td>25</td><td>22,511</td></tr><tr><td>_d8i0cka9io6g00ap66c0</td><td>16</td><td>7,625</td></tr><tr><td>_d8i01pi9io6g0095gha0</td><td>3</td><td>2,657</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×69, gemini-3.1-pro×3</div></div><div class=jc>
+<div class=jch><span class=sl>custom-maker</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>7564f170-6e9e-4529-a5ca-7411cf42d3a9</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>23.27</b></td><td>$6.99</td><td>61</td><td>39.3</td><td>4</td><td>106</td><td>27</td><td>7.6/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>5</td><td>0.92</td><td>+0.92</td></tr><tr><td>finish 2</td><td>28</td><td>11.15</td><td>+10.23</td></tr><tr><td>finish 3</td><td>55</td><td>19.28</td><td>+8.13</td></tr><tr><td>finish 4</td><td>59</td><td>23.27</td><td>+3.99</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>22</td><td>0–59</td></tr><tr><td>design</td><td>4</td><td>2–5</td></tr><tr><td>testing</td><td>34</td><td>15–55</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i0dda9io6g00ap6750</td><td>20</td><td>19,350</td></tr><tr><td>_d8i0a1i9io6g0095gtl0</td><td>14</td><td>19,401</td></tr><tr><td>_d8i01ra9io6g0095ghg0</td><td>4</td><td>2,561</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×56, gemini-3.1-pro×4</div></div><div class=jc>
+<div class=jch><span class=sl>design-to-print-1</span> <span class="pill e2">v2_credit_cap</span> <span class=jid>c613a210-a877-46d1-b6f6-48bbaa4637cc</span></div>
+<table class=mini><tr><th>ECU</th><th>USD</th><th>Steps</th><th>Min</th><th>Phases</th><th>Tool calls</th><th>Main LLM calls</th><th>Code Q</th></tr>
+<tr><td><b>17.82</b></td><td>$5.34</td><td>51</td><td>28.4</td><td>3</td><td>83</td><td>30</td><td>7.7/10 Strong</td></tr></table>
+<div class=cols>
+<div><div class=ct>Phase cost curve (cumulative ECU)</div><table class=mini><tr><th>Phase</th><th>@step</th><th>Cum ECU</th><th>Δ</th></tr><tr><td>finish 1</td><td>4</td><td>0.93</td><td>+0.93</td></tr><tr><td>finish 2</td><td>38</td><td>12.23</td><td>+11.3</td></tr><tr><td>finish 3</td><td>49</td><td>17.82</td><td>+5.59</td></tr></table></div>
+<div><div class=ct>Agent / sub-agent steps</div><table class=mini><tr><th>Agent</th><th>Steps</th><th>Span</th></tr><tr><td>full_stack</td><td>23</td><td>0–49</td></tr><tr><td>design</td><td>3</td><td>2–4</td></tr><tr><td>testing</td><td>24</td><td>15–38</td></tr></table></div>
+<div><div class=ct>Sub-agent runs (LLM-proxy)</div><table class=mini><tr><th>run</th><th>calls</th><th>out-tok</th></tr><tr><td>_d8i07b29io6g0095gnv0</td><td>24</td><td>24,500</td></tr><tr><td>_d8i01sq9io6g0095ghj0</td><td>3</td><td>2,023</td></tr></table></div>
+</div>
+<div class=mod>models: opus-4-7×47, gemini-3.1-pro×3</div></div></details>
+<div class=note style="margin-top:18px">Normal=postgres-gflash · v2_credit_cap=postgres-long-prompt. P5 excluded (no v2 runs). 27 jobs, 3/arm/prompt (v2 P4=6).</div>
+</div><script>
+new Chart(c1,{data:{labels:["P1 Task", "P2 PopUp", "P3 Micro", "P4 Laser"],datasets:[
+{type:'bar',label:'ECU Normal',data:[23.74, 10.09, 45.31, 16.23],backgroundColor:'#b07cff',yAxisID:'y'},
+{type:'bar',label:'ECU v2',data:[16.4, 7.86, 19.99, 20.38],backgroundColor:'#43c59e',yAxisID:'y'},
+{type:'line',label:'Quality Normal',data:[6.7, 8.0, 6.3, 7.2],borderColor:'#b07cff',yAxisID:'y2',tension:.3,spanGaps:true},
+{type:'line',label:'Quality v2',data:[4.0, 8.0, 6.0, 6.9],borderColor:'#43c59e',borderDash:[5,4],yAxisID:'y2',tension:.3,spanGaps:true}]},
+options:{plugins:{legend:{labels:{color:'#8a96a3',font:{size:11}}}},scales:{y:{position:'left',ticks:{color:'#8a96a3'},title:{display:true,text:'ECU',color:'#8a96a3'}},y2:{position:'right',min:0,max:10,ticks:{color:'#8a96a3'},title:{display:true,text:'Quality',color:'#8a96a3'},grid:{drawOnChartArea:false}},x:{ticks:{color:'#8a96a3'}}}}});
+</script></body></html>
