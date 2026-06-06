@@ -1,44 +1,191 @@
-<!doctype html><html><head><meta charset=utf-8><title>MVP Prompt Eval — Normal vs v2_credit_cap</title>
+<!doctype html><html><head><meta charset=utf-8><title>MVP-Phasing Prompt Eval — Normal vs v2_credit_cap</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script><style>
-:root{--bg:#0f1419;--card:#1a2027;--tx:#e6e6e6;--mut:#8a96a3;--bd:#2a323c;--e1:#b07cff;--e2:#43c59e;--pos:#43c59e;--warn:#f0a830}
+:root{--bg:#0f1419;--card:#1a2027;--tx:#e6e6e6;--mut:#8a96a3;--bd:#2a323c;--e1:#b07cff;--e2:#43c59e;--pos:#43c59e;--neg:#ff6b6b;--warn:#f0a830}
 body.light{--bg:#f5f7fa;--card:#fff;--tx:#1a2027;--mut:#5a6573;--bd:#dde3ea}
 *{box-sizing:border-box}body{margin:0;font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx)}
-.wrap{max-width:1100px;margin:0 auto;padding:28px}h1{font-size:24px;margin:0 0 4px}.sub{color:var(--mut);margin-bottom:18px}
-.legend span{margin-right:16px;font-size:13px}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
-.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0}.kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 18px;flex:1;min-width:160px}
-.kpi .big{font-size:25px;font-weight:700;color:var(--pos)}.kpi .lbl{color:var(--mut);font-size:12px}
+.wrap{max-width:1120px;margin:0 auto;padding:28px}h1{font-size:24px;margin:0 0 4px}h2{font-size:19px;border-bottom:2px solid var(--bd);padding-bottom:6px;margin-top:34px}
+.sub{color:var(--mut);margin-bottom:14px}.legend span{margin-right:16px;font-size:13px}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0}.kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 18px;flex:1;min-width:150px}
+.kpi .big{font-size:24px;font-weight:700;color:var(--pos)}.kpi .lbl{color:var(--mut);font-size:12px}
 table{width:100%;border-collapse:collapse;margin:6px 0 14px;font-size:13px}th,td{padding:7px 9px;border-bottom:1px solid var(--bd);text-align:center}th{color:var(--mut)}td:first-child,th:first-child{text-align:left}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.ephbox{background:var(--card);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
 .ephhdr{padding:8px 12px;font-weight:700}.ephhdr.eph1{background:rgba(176,124,255,.16);color:var(--e1)}.ephhdr.eph2{background:rgba(67,197,158,.16);color:var(--e2)}
 .ephbox table{margin:0}tr.best{background:rgba(67,197,158,.13);font-weight:600}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px;margin:18px 0}.pos{color:var(--pos);font-weight:700}
-.toggle{position:fixed;top:14px;right:14px;background:var(--card);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:6px 12px;cursor:pointer}
-.note{color:var(--mut);font-size:12px}h3{margin:22px 0 8px}</style></head><body>
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px;margin:18px 0}.pos{color:var(--pos);font-weight:700}.neg{color:var(--neg);font-weight:700}
+.toggle{position:fixed;top:14px;right:14px;background:var(--card);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:6px 12px;cursor:pointer;z-index:9}
+.note{color:var(--mut);font-size:12px}h3{margin:22px 0 8px}
+details{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 16px;margin:12px 0}summary{cursor:pointer;font-size:16px;padding:4px 0}
+.armlabel{font-weight:700;margin:12px 0 6px;padding:3px 10px;border-radius:6px;display:inline-block}.armlabel.eph1{background:rgba(176,124,255,.16);color:var(--e1)}.armlabel.eph2{background:rgba(67,197,158,.16);color:var(--e2)}
+.jobcard{border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:8px 0;background:rgba(255,255,255,.02)}
+.jobhdr{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.slug{font-weight:700}.jid{font-family:ui-monospace,monospace;font-size:11px;color:var(--mut)}
+.metrics{display:flex;gap:14px;flex-wrap:wrap;margin:7px 0;font-size:12px;color:var(--mut)}.metrics b{color:var(--tx)}
+.row{margin:4px 0;font-size:12px}.lbl{color:var(--mut);margin-right:6px}
+.chip{display:inline-block;background:rgba(176,124,255,.14);color:var(--e1);border-radius:6px;padding:2px 8px;margin:2px;font-size:11px}.chip.m{background:rgba(67,197,158,.14);color:var(--e2)}
+</style></head><body>
 <button class=toggle onclick="document.body.classList.toggle('light')">◐ theme</button><div class=wrap>
 <h1>MVP-Phasing Prompt Eval — Normal Prompt vs v2_credit_cap</h1>
-<div class=sub>Prompts P1–P3 · 3 runs per prompt per arm · 18 builds · ECU + Latency + Code Quality · 2026-06-06 · ★ = best of 3</div>
-<div class=legend><span><span class="dot" style="background:var(--e1)"></span><b>Normal Prompt</b> — baseline, agent self-decides scope</span>
-<span><span class="dot" style="background:var(--e2)"></span><b>v2_credit_cap</b> — MVP-split system prompt, 10-credit cap</span></div>
+<div class=sub>Prompts P1–P4 · 3 runs per prompt per arm (v2 P4 = 6) · 27 builds · ECU + Latency + Code Quality + trajectory study · 2026-06-06</div>
+<div class=legend><span><span class="dot" style="background:var(--e1)"></span><b>Normal Prompt</b> — baseline (gflash), agent self-decides scope</span>
+<span><span class="dot" style="background:var(--e2)"></span><b>v2_credit_cap</b> — MVP-split system prompt + 10-credit cap (long-prompt)</span></div>
+
+<h2>Section 1 — Comparison Summary</h2>
 <div class=kpis>
-<div class=kpi><div class=big>−44%</div><div class=lbl>v2_credit_cap total ECU vs Normal Prompt</div></div>
-<div class=kpi><div class=big>−37%</div><div class=lbl>v2_credit_cap avg latency vs Normal Prompt</div></div>
+<div class=kpi><div class=big>−32%</div><div class=lbl>v2_credit_cap total ECU vs Normal Prompt (P1–P4)</div></div>
+<div class=kpi><div class=big>−38%</div><div class=lbl>v2_credit_cap avg latency vs Normal Prompt</div></div>
 <div class=kpi><div class=big style="color:var(--warn)">4.0 vs 6.7</div><div class=lbl>P1 code quality: v2_credit_cap vs Normal Prompt</div></div>
-<div class=kpi><div class=big>18/18</div><div class=lbl>builds code-reviewed</div></div></div>
-<div class=card><h3 style="margin-top:0">ECU vs Code Quality by prompt</h3><canvas id=c1 height=90></canvas></div>
-<div class=card><h3 style="margin-top:0">Comparison</h3>
-<table><tr><th>Prompt</th><th>ECU Normal Prompt</th><th>ECU v2_credit_cap</th><th>Δ ECU</th><th>Qual Normal Prompt</th><th>Qual v2_credit_cap</th><th>Lat Normal Prompt</th><th>Lat v2_credit_cap</th><th>Winner</th></tr><tr><td>P1 Task Management</td><td>23.74</td><td>16.4</td><td class="pos">−31%</td><td>6.7</td><td>4.0</td><td>46.63</td><td>30.83</td><td><b>Normal Prompt</b></td></tr><tr><td>P2 PopUp Profit</td><td>10.09</td><td>7.86</td><td class="pos">−22%</td><td>8.0</td><td>8.0</td><td>34.1</td><td>18.9</td><td><b>v2_credit_cap</b></td></tr><tr><td>P3 Micro-Loans (RENDOC)</td><td>45.31</td><td>19.99</td><td class="pos">−56%</td><td>6.3</td><td>6.0</td><td>66.8</td><td>42.97</td><td><b>mixed</b></td></tr></table></div>
-<h3>P1 — Task Management</h3><div class="grid2"><div class="ephbox"><div class="ephhdr eph1">Normal Prompt</div><table><tr><th>Job</th><th>ECU</th><th>USD</th><th>Steps</th><th>Lat min</th><th>Code Q</th><th>Tier</th></tr><tr class="best"><td>★ task-flow-57</td><td>19.48</td><td>5.84</td><td>47</td><td>42.1</td><td>7/10</td><td>Acceptable</td></tr><tr><td>project-sync</td><td>28.57</td><td>8.6</td><td>67</td><td>50.4</td><td>6/10</td><td>Acceptable</td></tr><tr><td>kanban-sync</td><td>23.16</td><td>6.96</td><td>58</td><td>47.4</td><td>7/10</td><td>Acceptable</td></tr></table></div><div class="ephbox"><div class="ephhdr eph2">v2_credit_cap</div><table><tr><th>Job</th><th>ECU</th><th>USD</th><th>Steps</th><th>Lat min</th><th>Code Q</th><th>Tier</th></tr><tr><td>project-hub-25</td><td>16.35</td><td>4.89</td><td>42</td><td>28.8</td><td>4/10</td><td>Weak</td></tr><tr class="best"><td>★ workflow-central-2</td><td>15.97</td><td>4.78</td><td>48</td><td>28.3</td><td>4/10</td><td>Weak</td></tr><tr><td>teamtask-1</td><td>16.88</td><td>5.06</td><td>49</td><td>35.4</td><td>4/10</td><td>Weak</td></tr></table></div></div><h3>P2 — PopUp Profit</h3><div class="grid2"><div class="ephbox"><div class="ephhdr eph1">Normal Prompt</div><table><tr><th>Job</th><th>ECU</th><th>USD</th><th>Steps</th><th>Lat min</th><th>Code Q</th><th>Tier</th></tr><tr><td>know-before-show-1</td><td>11.26</td><td>3.35</td><td>26</td><td>36.1</td><td>8/10</td><td>Strong</td></tr><tr class="best"><td>★ event-profit-hub</td><td>7.84</td><td>2.32</td><td>22</td><td>30.8</td><td>8/10</td><td>Strong</td></tr><tr><td>booth-planner-1</td><td>11.18</td><td>3.33</td><td>28</td><td>35.4</td><td>8/10</td><td>Strong</td></tr></table></div><div class="ephbox"><div class="ephhdr eph2">v2_credit_cap</div><table><tr><th>Job</th><th>ECU</th><th>USD</th><th>Steps</th><th>Lat min</th><th>Code Q</th><th>Tier</th></tr><tr><td>profit-prep</td><td>8.3</td><td>2.46</td><td>29</td><td>19.4</td><td>8/10</td><td>Strong</td></tr><tr><td>know-before-show-2</td><td>7.7</td><td>2.27</td><td>23</td><td>18.7</td><td>8/10</td><td>Strong</td></tr><tr class="best"><td>★ vendor-calculator-4</td><td>7.57</td><td>2.23</td><td>23</td><td>18.6</td><td>8/10</td><td>Strong</td></tr></table></div></div><h3>P3 — Micro-Loans (RENDOC)</h3><div class="grid2"><div class="ephbox"><div class="ephhdr eph1">Normal Prompt</div><table><tr><th>Job</th><th>ECU</th><th>USD</th><th>Steps</th><th>Lat min</th><th>Code Q</th><th>Tier</th></tr><tr class="best"><td>★ rendoc-loans-4</td><td>50.54</td><td>15.26</td><td>81</td><td>76.8</td><td>7/10</td><td>Acceptable</td></tr><tr><td>micro-lending-hub</td><td>43.69</td><td>13.18</td><td>77</td><td>61.5</td><td>6/10</td><td>Mid</td></tr><tr><td>credit-control</td><td>41.69</td><td>12.57</td><td>97</td><td>62.1</td><td>6/10</td><td>Mid</td></tr></table></div><div class="ephbox"><div class="ephhdr eph2">v2_credit_cap</div><table><tr><th>Job</th><th>ECU</th><th>USD</th><th>Steps</th><th>Lat min</th><th>Code Q</th><th>Tier</th></tr><tr class="best"><td>★ micro-loans-admin</td><td>17.21</td><td>5.16</td><td>31</td><td>40.1</td><td>6/10</td><td>Mid</td></tr><tr><td>rendoc-credit-1</td><td>23.59</td><td>7.09</td><td>60</td><td>45.9</td><td>6/10</td><td>Mid</td></tr><tr><td>rendoc-portfolio</td><td>19.16</td><td>5.75</td><td>43</td><td>42.9</td><td>6/10</td><td>Mid</td></tr></table></div></div>
-<div class=card><h3 style="margin-top:0">Verdict</h3><p><b>v2_credit_cap</b> cuts ECU 22–56% and is faster on every prompt — the conversion win is real.
-BUT the saving is partly <b>because it builds less</b>: on the complex Task-Management prompt (P1) v2_credit_cap shipped thin Phase-1 slices (code quality 4/10 "Weak", ~2/10 spec coverage) vs <b>Normal Prompt</b>'s fuller builds (6–7/10). On P2 (a naturally small app) v2_credit_cap matches Normal Prompt quality (8/10) at lower cost — a clean win. On P3 quality is comparable (~6/10 both) at ~56% lower cost — a win. <b>Net: v2_credit_cap is the right default for getting users to a working result inside the 10-credit cap, but on large prompts it under-builds — the deferred scope must actually get built in phase 2, or users receive a thin product.</b></p></div>
-<div class=note>Normal Prompt = gflash environment (normal prompt). v2_credit_cap = long-prompt environment (v2 prompt with credit cap). ECU/latency from credit_ledger + trajectories; code quality = static review 1–10. P4 (one arm only) and P5 (not run) excluded.</div>
+<div class=kpi><div class=big>27</div><div class=lbl>builds analysed</div></div></div>
+<div class=card><h3 style="margin-top:0">ECU vs Code Quality by prompt</h3><canvas id=c1 height=85></canvas></div>
+<div class=card><h3 style="margin-top:0">Cross-arm comparison (avg of runs)</h3>
+<table><tr><th>Prompt</th><th>ECU Normal Prompt</th><th>ECU v2_credit_cap</th><th>Δ ECU</th><th>Qual Normal Prompt</th><th>Qual v2_credit_cap</th><th>Lat Normal Prompt</th><th>Lat v2_credit_cap</th></tr><tr><td>P1 Task Management</td><td>23.74</td><td>16.4</td><td class="pos">−31%</td><td>6.7</td><td>4.0</td><td>46.63</td><td>30.83</td></tr><tr><td>P2 PopUp Profit</td><td>10.09</td><td>7.86</td><td class="pos">−22%</td><td>8.0</td><td>8.0</td><td>34.1</td><td>18.9</td></tr><tr><td>P3 Micro-Loans (RENDOC)</td><td>45.31</td><td>19.99</td><td class="pos">−56%</td><td>6.3</td><td>6.0</td><td>66.8</td><td>42.97</td></tr><tr><td>P4 Laser-Engraving</td><td>16.23</td><td>20.38</td><td class="neg">+26%</td><td>7.2</td><td>6.9</td><td>51.83</td><td>31.75</td></tr></table>
+<div class=note>Δ ECU positive = v2_credit_cap cheaper. P4 quality fills in as its 9 reviews complete. ★ in per-prompt tables = best of the runs.</div></div>
+<h3>P1 — Task Management</h3><div class="grid2"><div class="ephbox"><div class="ephhdr eph1">Normal Prompt (3 runs)</div><table><tr><th>Job</th><th>ECU</th><th>Lat min</th><th>Phases</th><th>Code Q</th><th>Tier</th></tr><tr class="best"><td>★ task-flow-57</td><td>19.48</td><td>42.1</td><td>3</td><td>7/10</td><td>Acceptable</td></tr><tr><td>project-sync</td><td>28.57</td><td>50.4</td><td>4</td><td>6/10</td><td>Acceptable</td></tr><tr><td>kanban-sync</td><td>23.16</td><td>47.4</td><td>3</td><td>7/10</td><td>Acceptable</td></tr></table></div><div class="ephbox"><div class="ephhdr eph2">v2_credit_cap (3 runs)</div><table><tr><th>Job</th><th>ECU</th><th>Lat min</th><th>Phases</th><th>Code Q</th><th>Tier</th></tr><tr><td>project-hub-25</td><td>16.35</td><td>28.8</td><td>3</td><td>4/10</td><td>Weak</td></tr><tr class="best"><td>★ workflow-central-2</td><td>15.97</td><td>28.3</td><td>4</td><td>4/10</td><td>Weak</td></tr><tr><td>teamtask-1</td><td>16.88</td><td>35.4</td><td>4</td><td>4/10</td><td>Weak</td></tr></table></div></div><h3>P2 — PopUp Profit</h3><div class="grid2"><div class="ephbox"><div class="ephhdr eph1">Normal Prompt (3 runs)</div><table><tr><th>Job</th><th>ECU</th><th>Lat min</th><th>Phases</th><th>Code Q</th><th>Tier</th></tr><tr><td>know-before-show-1</td><td>11.26</td><td>36.1</td><td>3</td><td>8/10</td><td>Strong</td></tr><tr class="best"><td>★ event-profit-hub</td><td>7.84</td><td>30.8</td><td>3</td><td>8/10</td><td>Strong</td></tr><tr><td>booth-planner-1</td><td>11.18</td><td>35.4</td><td>3</td><td>8/10</td><td>Strong</td></tr></table></div><div class="ephbox"><div class="ephhdr eph2">v2_credit_cap (3 runs)</div><table><tr><th>Job</th><th>ECU</th><th>Lat min</th><th>Phases</th><th>Code Q</th><th>Tier</th></tr><tr><td>profit-prep</td><td>8.3</td><td>19.4</td><td>3</td><td>8/10</td><td>Strong</td></tr><tr><td>know-before-show-2</td><td>7.7</td><td>18.7</td><td>3</td><td>8/10</td><td>Strong</td></tr><tr class="best"><td>★ vendor-calculator-4</td><td>7.57</td><td>18.6</td><td>3</td><td>8/10</td><td>Strong</td></tr></table></div></div><h3>P3 — Micro-Loans (RENDOC)</h3><div class="grid2"><div class="ephbox"><div class="ephhdr eph1">Normal Prompt (3 runs)</div><table><tr><th>Job</th><th>ECU</th><th>Lat min</th><th>Phases</th><th>Code Q</th><th>Tier</th></tr><tr class="best"><td>★ rendoc-loans-4</td><td>50.54</td><td>76.8</td><td>4</td><td>7/10</td><td>Acceptable</td></tr><tr><td>micro-lending-hub</td><td>43.69</td><td>61.5</td><td>3</td><td>6/10</td><td>Mid</td></tr><tr><td>credit-control</td><td>41.69</td><td>62.1</td><td>3</td><td>6/10</td><td>Mid</td></tr></table></div><div class="ephbox"><div class="ephhdr eph2">v2_credit_cap (3 runs)</div><table><tr><th>Job</th><th>ECU</th><th>Lat min</th><th>Phases</th><th>Code Q</th><th>Tier</th></tr><tr class="best"><td>★ micro-loans-admin</td><td>17.21</td><td>40.1</td><td>3</td><td>6/10</td><td>Mid</td></tr><tr><td>rendoc-credit-1</td><td>23.59</td><td>45.9</td><td>3</td><td>6/10</td><td>Mid</td></tr><tr><td>rendoc-portfolio</td><td>19.16</td><td>42.9</td><td>2</td><td>6/10</td><td>Mid</td></tr></table></div></div><h3>P4 — Laser-Engraving</h3><div class="grid2"><div class="ephbox"><div class="ephhdr eph1">Normal Prompt (3 runs)</div><table><tr><th>Job</th><th>ECU</th><th>Lat min</th><th>Phases</th><th>Code Q</th><th>Tier</th></tr><tr><td>vector-create</td><td>10.6</td><td>39.3</td><td>3</td><td>7.0/10</td><td>Strong</td></tr><tr><td>engrave-studio-3</td><td>20.78</td><td>70.3</td><td>3</td><td>7.2/10</td><td>Strong</td></tr><tr class="best"><td>★ custom-proof</td><td>17.31</td><td>45.9</td><td>3</td><td>7.3/10</td><td>Strong</td></tr></table></div><div class="ephbox"><div class="ephhdr eph2">v2_credit_cap (6 runs)</div><table><tr><th>Job</th><th>ECU</th><th>Lat min</th><th>Phases</th><th>Code Q</th><th>Tier</th></tr><tr><td>engrave-studio-4</td><td>22.01</td><td>29.2</td><td>3</td><td>6.0/10</td><td>Mid</td></tr><tr><td>personalize-now</td><td>17.22</td><td>28.4</td><td>2</td><td>6.5/10</td><td>Mid</td></tr><tr><td>create-ship-direct</td><td>20.74</td><td>31.2</td><td>4</td><td>7.0/10</td><td>Solid</td></tr><tr><td>engrave-studio-5</td><td>21.21</td><td>34.0</td><td>4</td><td>6.5/10</td><td>Mid</td></tr><tr><td>custom-maker</td><td>23.27</td><td>39.3</td><td>4</td><td>7.6/10</td><td>Strong</td></tr><tr class="best"><td>★ design-to-print-1</td><td>17.82</td><td>28.4</td><td>3</td><td>7.7/10</td><td>Strong</td></tr></table></div></div>
+
+<h2>Section 2 — Detailed Trajectory Study (per job, from DB)</h2>
+<div class=note>Full non-truncated job_id · ECU/USD/steps/latency · phases (finish count) · sub-agent runs (LLM-proxy) · agent &amp; stack picked (expertise type + step count) · models used. Source: trajectories + credit_ledger + llm_logs_partitioned.</div>
+<details open><summary><b>P1 — Task Management</b></summary><div class="armlabel eph1">Normal Prompt · 3 run(s)</div><div class=jobcard>
+<div class=jobhdr><span class=slug>task-flow-57</span><span class=jid>a2df4e68-83bd-4592-a8da-9c68ee369805</span></div>
+<div class=metrics><span>ECU <b>19.48</b></span><span>$5.84</span><span>47 steps</span><span>42.1 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (17 calls)</span><span>intent calls: 4</span><span>Code Q: 7/10 Acceptable</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·29</span> <span class=chip>testing·14</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·43</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>project-sync</span><span class=jid>ff6d38e3-a7ba-4be7-9bd3-d068b3bc040e</span></div>
+<div class=metrics><span>ECU <b>28.57</b></span><span>$8.6</span><span>67 steps</span><span>50.4 min</span><span>4 phase(s)/finishes</span><span>subagent runs: <b>3</b> (38 calls)</span><span>intent calls: 5</span><span>Code Q: 6/10 Acceptable</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·35</span> <span class=chip>full_stack·28</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·63</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>kanban-sync</span><span class=jid>98e5fd48-b954-47b2-8a64-706094b79e4e</span></div>
+<div class=metrics><span>ECU <b>23.16</b></span><span>$6.96</span><span>58 steps</span><span>47.4 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (18 calls)</span><span>intent calls: 4</span><span>Code Q: 7/10 Acceptable</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·39</span> <span class=chip>testing·14</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·53</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div><div class="armlabel eph2">v2_credit_cap · 3 run(s)</div><div class=jobcard>
+<div class=jobhdr><span class=slug>project-hub-25</span><span class=jid>2af8df68-1bb9-45bb-ad38-5b7456f0184e</span></div>
+<div class=metrics><span>ECU <b>16.35</b></span><span>$4.89</span><span>42 steps</span><span>28.8 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (17 calls)</span><span>intent calls: 4</span><span>Code Q: 4/10 Weak</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·24</span> <span class=chip>testing·14</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·38</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>workflow-central-2</span><span class=jid>f1959bd6-230e-4e47-86b3-305691d8be15</span></div>
+<div class=metrics><span>ECU <b>15.97</b></span><span>$4.78</span><span>48 steps</span><span>28.3 min</span><span>4 phase(s)/finishes</span><span>subagent runs: <b>3</b> (27 calls)</span><span>intent calls: 5</span><span>Code Q: 4/10 Weak</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·24</span> <span class=chip>full_stack·20</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·44</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>teamtask-1</span><span class=jid>75c54a5b-5bea-4208-bd55-be080c7f4ba1</span></div>
+<div class=metrics><span>ECU <b>16.88</b></span><span>$5.06</span><span>49 steps</span><span>35.4 min</span><span>4 phase(s)/finishes</span><span>subagent runs: <b>3</b> (26 calls)</span><span>intent calls: 5</span><span>Code Q: 4/10 Weak</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·22</span> <span class=chip>testing·21</span> <span class=chip>design·4</span> <span class=chip>support_agent_sonnet_4_5·1</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·43</span> <span class="chip m">gemini-3.1-pro·4</span> <span class="chip m">sonnet-4-5-20250929·1</span></div>
+</div></details><details open><summary><b>P2 — PopUp Profit</b></summary><div class="armlabel eph1">Normal Prompt · 3 run(s)</div><div class=jobcard>
+<div class=jobhdr><span class=slug>know-before-show-1</span><span class=jid>fd6a87d5-e834-4615-8f12-8c22a74347b8</span></div>
+<div class=metrics><span>ECU <b>11.26</b></span><span>$3.35</span><span>26 steps</span><span>36.1 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (8 calls)</span><span>intent calls: 4</span><span>Code Q: 8/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·17</span> <span class=chip>testing·5</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·22</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>event-profit-hub</span><span class=jid>31a35f59-0b54-4ab0-8460-be07012901e6</span></div>
+<div class=metrics><span>ECU <b>7.84</b></span><span>$2.32</span><span>22 steps</span><span>30.8 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (8 calls)</span><span>intent calls: 4</span><span>Code Q: 8/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·13</span> <span class=chip>testing·5</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·18</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>booth-planner-1</span><span class=jid>4cab5e8a-39c6-47d5-805b-6756f86090dc</span></div>
+<div class=metrics><span>ECU <b>11.18</b></span><span>$3.33</span><span>28 steps</span><span>35.4 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (9 calls)</span><span>intent calls: 4</span><span>Code Q: 8/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·18</span> <span class=chip>testing·6</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·24</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class="armlabel eph2">v2_credit_cap · 3 run(s)</div><div class=jobcard>
+<div class=jobhdr><span class=slug>profit-prep</span><span class=jid>7ab9ef6a-3586-4df7-bf9d-b3be3670426a</span></div>
+<div class=metrics><span>ECU <b>8.3</b></span><span>$2.46</span><span>29 steps</span><span>19.4 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (11 calls)</span><span>intent calls: 4</span><span>Code Q: 8/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·17</span> <span class=chip>testing·7</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·24</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>know-before-show-2</span><span class=jid>3645cff0-1c3c-438b-a46a-a5bd9016a351</span></div>
+<div class=metrics><span>ECU <b>7.7</b></span><span>$2.27</span><span>23 steps</span><span>18.7 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (8 calls)</span><span>intent calls: 4</span><span>Code Q: 8/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·14</span> <span class=chip>testing·5</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·19</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>vendor-calculator-4</span><span class=jid>51d60426-a963-4471-a2b0-5f4635206075</span></div>
+<div class=metrics><span>ECU <b>7.57</b></span><span>$2.23</span><span>23 steps</span><span>18.6 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (9 calls)</span><span>intent calls: 4</span><span>Code Q: 8/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·13</span> <span class=chip>testing·5</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·18</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div></details><details open><summary><b>P3 — Micro-Loans (RENDOC)</b></summary><div class="armlabel eph1">Normal Prompt · 3 run(s)</div><div class=jobcard>
+<div class=jobhdr><span class=slug>rendoc-loans-4</span><span class=jid>a9dcb442-efb9-4695-a72d-59491ae35736</span></div>
+<div class=metrics><span>ECU <b>50.54</b></span><span>$15.26</span><span>81 steps</span><span>76.8 min</span><span>4 phase(s)/finishes</span><span>subagent runs: <b>3</b> (35 calls)</span><span>intent calls: 5</span><span>Code Q: 7/10 Acceptable</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·45</span> <span class=chip>testing·31</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·76</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>micro-lending-hub</span><span class=jid>44afcf0c-116b-4f92-81aa-c5c636a89b06</span></div>
+<div class=metrics><span>ECU <b>43.69</b></span><span>$13.18</span><span>77 steps</span><span>61.5 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (31 calls)</span><span>intent calls: 4</span><span>Code Q: 6/10 Mid</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·45</span> <span class=chip>testing·24</span> <span class=chip>design·7</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·69</span> <span class="chip m">gemini-3.1-pro·7</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>credit-control</span><span class=jid>e16f0c6a-99c9-44f5-adca-1def18073f05</span></div>
+<div class=metrics><span>ECU <b>41.69</b></span><span>$12.57</span><span>97 steps</span><span>62.1 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (44 calls)</span><span>intent calls: 4</span><span>Code Q: 6/10 Mid</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·52</span> <span class=chip>testing·40</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·92</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div><div class="armlabel eph2">v2_credit_cap · 3 run(s)</div><div class=jobcard>
+<div class=jobhdr><span class=slug>micro-loans-admin</span><span class=jid>0cfaeb9d-39fe-45ae-8f6b-fa8fa1439285</span></div>
+<div class=metrics><span>ECU <b>17.21</b></span><span>$5.16</span><span>31 steps</span><span>40.1 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (19 calls)</span><span>intent calls: 4</span><span>Code Q: 6/10 Mid</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·16</span> <span class=chip>full_stack·11</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·27</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>rendoc-credit-1</span><span class=jid>e6316c6e-9808-4cc2-a9a1-2e2944103c4f</span></div>
+<div class=metrics><span>ECU <b>23.59</b></span><span>$7.09</span><span>60 steps</span><span>45.9 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (35 calls)</span><span>intent calls: 4</span><span>Code Q: 6/10 Mid</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·31</span> <span class=chip>full_stack·24</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·55</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>rendoc-portfolio</span><span class=jid>9dec0190-7d4d-4704-bb6b-dff6fa7a9b5b</span></div>
+<div class=metrics><span>ECU <b>19.16</b></span><span>$5.75</span><span>43 steps</span><span>42.9 min</span><span>2 phase(s)/finishes</span><span>subagent runs: <b>2</b> (24 calls)</span><span>intent calls: 4</span><span>Code Q: 6/10 Mid</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·20</span> <span class=chip>full_stack·18</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·38</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div></details><details open><summary><b>P4 — Laser-Engraving</b></summary><div class="armlabel eph1">Normal Prompt · 3 run(s)</div><div class=jobcard>
+<div class=jobhdr><span class=slug>vector-create</span><span class=jid>20d5657d-93fd-4562-b875-0b93c31a9cfc</span></div>
+<div class=metrics><span>ECU <b>10.6</b></span><span>$3.15</span><span>30 steps</span><span>39.3 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (14 calls)</span><span>intent calls: 4</span><span>Code Q: 7.0/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·15</span> <span class=chip>testing·11</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·26</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>engrave-studio-3</span><span class=jid>10cfb936-5fbd-4198-a08e-b42de12431f2</span></div>
+<div class=metrics><span>ECU <b>20.78</b></span><span>$6.24</span><span>54 steps</span><span>70.3 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (34 calls)</span><span>intent calls: 4</span><span>Code Q: 7.2/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·24</span> <span class=chip>full_stack·20</span> <span class=chip>design·9</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·44</span> <span class="chip m">gemini-3.1-pro·9</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>custom-proof</span><span class=jid>c6e82396-1ad2-491a-94cc-353ea125af1a</span></div>
+<div class=metrics><span>ECU <b>17.31</b></span><span>$5.18</span><span>44 steps</span><span>45.9 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (24 calls)</span><span>intent calls: 4</span><span>Code Q: 7.3/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·20</span> <span class=chip>full_stack·19</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·39</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div><div class="armlabel eph2">v2_credit_cap · 6 run(s)</div><div class=jobcard>
+<div class=jobhdr><span class=slug>engrave-studio-4</span><span class=jid>5746d87e-06c6-42ef-a858-b0fa7ee02ca7</span></div>
+<div class=metrics><span>ECU <b>22.01</b></span><span>$6.61</span><span>62 steps</span><span>29.2 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (25 calls)</span><span>intent calls: 4</span><span>Code Q: 6.0/10 Mid</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>full_stack·36</span> <span class=chip>testing·21</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·57</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>personalize-now</span><span class=jid>2cfa1b95-5155-46c5-bd0a-be1220925b62</span></div>
+<div class=metrics><span>ECU <b>17.22</b></span><span>$5.16</span><span>42 steps</span><span>28.4 min</span><span>2 phase(s)/finishes</span><span>subagent runs: <b>2</b> (25 calls)</span><span>intent calls: 4</span><span>Code Q: 6.5/10 Mid</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·20</span> <span class=chip>full_stack·16</span> <span class=chip>design·5</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·36</span> <span class="chip m">gemini-3.1-pro·5</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>create-ship-direct</span><span class=jid>ea163e4a-c6e4-493e-a996-0979f20bacc9</span></div>
+<div class=metrics><span>ECU <b>20.74</b></span><span>$6.23</span><span>54 steps</span><span>31.2 min</span><span>4 phase(s)/finishes</span><span>subagent runs: <b>3</b> (32 calls)</span><span>intent calls: 5</span><span>Code Q: 7.0/10 Solid</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·27</span> <span class=chip>full_stack·21</span> <span class=chip>design·5</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·48</span> <span class="chip m">gemini-3.1-pro·5</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>engrave-studio-5</span><span class=jid>d44d2c97-0a9f-4a85-b8fe-6e7fff6e2fa8</span></div>
+<div class=metrics><span>ECU <b>21.21</b></span><span>$6.37</span><span>73 steps</span><span>34.0 min</span><span>4 phase(s)/finishes</span><span>subagent runs: <b>3</b> (44 calls)</span><span>intent calls: 5</span><span>Code Q: 6.5/10 Mid</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·41</span> <span class=chip>full_stack·28</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·69</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>custom-maker</span><span class=jid>7564f170-6e9e-4529-a5ca-7411cf42d3a9</span></div>
+<div class=metrics><span>ECU <b>23.27</b></span><span>$6.99</span><span>61 steps</span><span>39.3 min</span><span>4 phase(s)/finishes</span><span>subagent runs: <b>3</b> (38 calls)</span><span>intent calls: 5</span><span>Code Q: 7.6/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·34</span> <span class=chip>full_stack·22</span> <span class=chip>design·4</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·56</span> <span class="chip m">gemini-3.1-pro·4</span></div>
+</div><div class=jobcard>
+<div class=jobhdr><span class=slug>design-to-print-1</span><span class=jid>c613a210-a877-46d1-b6f6-48bbaa4637cc</span></div>
+<div class=metrics><span>ECU <b>17.82</b></span><span>$5.34</span><span>51 steps</span><span>28.4 min</span><span>3 phase(s)/finishes</span><span>subagent runs: <b>2</b> (27 calls)</span><span>intent calls: 4</span><span>Code Q: 7.7/10 Strong</span></div>
+<div class=row><span class=lbl>agents / stack picked:</span> <span class=chip>testing·24</span> <span class=chip>full_stack·23</span> <span class=chip>design·3</span></div>
+<div class=row><span class=lbl>models:</span> <span class="chip m">opus-4-7·47</span> <span class="chip m">gemini-3.1-pro·3</span></div>
+</div></details>
+
+<div class=card><h3 style="margin-top:0">Verdict</h3><p><b>v2_credit_cap</b> cuts total ECU ~32% across P1–P4 and runs faster, but the saving is uneven and partly from <b>building less</b>. P1 (complex): cheaper but thin (quality 4 vs 6.7). P2 (small): equal quality (8/8) at lower cost — clean win. P3 (large): comparable quality at ~56% less — win. <b>P4: the cap arm spent slightly MORE</b> (avg 20.4 vs 16.2 ECU) and ran extra phases — the MVP-split didn't help on this prompt. Net: v2_credit_cap is a strong default for getting users to a usable result within budget on most prompts, but it under-builds complex apps and shows no benefit on P4.</p></div>
+<div class=note>Normal Prompt=postgres-gflash · v2_credit_cap=postgres-long-prompt. P5 excluded (no v2 runs exist). ECU=credit_ledger; latency/phases/agents=trajectories; sub-agents=llm_logs_partitioned run_id suffixes.</div>
 </div><script>
-new Chart(c1,{data:{labels:['P1 Task','P2 PopUp','P3 Loans'],datasets:[
-{type:'bar',label:'ECU Normal Prompt',data:[23.74, 10.09, 45.31],backgroundColor:'#b07cff',yAxisID:'y'},
-{type:'bar',label:'ECU v2_credit_cap',data:[16.4, 7.86, 19.99],backgroundColor:'#43c59e',yAxisID:'y'},
-{type:'line',label:'Quality Normal Prompt',data:[6.7, 8.0, 6.3],borderColor:'#b07cff',yAxisID:'y2',tension:.3},
-{type:'line',label:'Quality v2_credit_cap',data:[4.0, 8.0, 6.0],borderColor:'#43c59e',borderDash:[5,4],yAxisID:'y2',tension:.3}]},
-options:{plugins:{legend:{labels:{color:'#8a96a3'}}},scales:{
-y:{position:'left',ticks:{color:'#8a96a3'},title:{display:true,text:'ECU',color:'#8a96a3'}},
-y2:{position:'right',min:0,max:10,ticks:{color:'#8a96a3'},title:{display:true,text:'Code Q /10',color:'#8a96a3'},grid:{drawOnChartArea:false}},
-x:{ticks:{color:'#8a96a3'}}}}});
+new Chart(c1,{data:{labels:["P1 Task", "P2 PopUp", "P3 Micro-Loans", "P4 Laser-Engraving"],datasets:[
+{type:'bar',label:'ECU Normal Prompt',data:[23.74, 10.09, 45.31, 16.23],backgroundColor:'#b07cff',yAxisID:'y'},
+{type:'bar',label:'ECU v2_credit_cap',data:[16.4, 7.86, 19.99, 20.38],backgroundColor:'#43c59e',yAxisID:'y'},
+{type:'line',label:'Quality Normal Prompt',data:[6.7, 8.0, 6.3, 7.2],borderColor:'#b07cff',yAxisID:'y2',tension:.3,spanGaps:true},
+{type:'line',label:'Quality v2_credit_cap',data:[4.0, 8.0, 6.0, 6.9],borderColor:'#43c59e',borderDash:[5,4],yAxisID:'y2',tension:.3,spanGaps:true}]},
+options:{plugins:{legend:{labels:{color:'#8a96a3'}}},scales:{y:{position:'left',ticks:{color:'#8a96a3'},title:{display:true,text:'ECU',color:'#8a96a3'}},y2:{position:'right',min:0,max:10,ticks:{color:'#8a96a3'},title:{display:true,text:'Code Q /10',color:'#8a96a3'},grid:{drawOnChartArea:false}},x:{ticks:{color:'#8a96a3'}}}}});
 </script></body></html>
